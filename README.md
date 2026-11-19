@@ -101,7 +101,6 @@ The cookie policy names **Crypto Sentinel (gabidumitriu.ro)** as the data contro
 - **Educational material, not legal advice.** Always verify against official FATF, OFAC, EU and UN publications before acting.
 - Case studies are **reconstructed from FATF-reported cases**. They illustrate patterns and are not open investigations.
 - Prevalence figures are indicative and derived from FATF case-study analysis (2017–2020).
-- The dashboard does not query any blockchain. For live Solana wallet screening, see **[SolTrace](https://github.com/rugerpunk/SolTrace)**.
 
 ## Troubleshooting
 
