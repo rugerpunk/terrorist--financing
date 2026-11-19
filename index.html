@@ -1,0 +1,2112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TF in Crypto — Forensic Intelligence Guide</title>
+<!-- Google Analytics 4 · consent mode v2 (everything denied until the visitor accepts) -->
+<script>
+  window.CS_GA_ID = 'G-XXXXXXXXXX'; /* ← replace with your GA4 Measurement ID */
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+  gtag('consent', 'default', {
+    ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied',
+    analytics_storage: 'denied', functionality_storage: 'denied', personalization_storage: 'denied',
+    security_storage: 'granted', wait_for_update: 500
+  });
+  gtag('set', 'ads_data_redaction', true);
+</script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+<style>
+:root {
+  --navy: #060e1a;
+  --dark-teal: #0a1e30;
+  --mid-teal: #0d2e42;
+  --accent: #1a8c7a;
+  --accent2: #0fb896;
+  --accent3: #14c4a2;
+  --glow: rgba(15,184,150,.15);
+  --glass: rgba(10,30,48,0.75);
+  --border: rgba(15,184,150,.16);
+  --text: #d0eae6;
+  --text-muted: #6b9fa0;
+  --danger: #e84855;
+  --warn: #f5a623;
+  --safe: #0fb896;
+  --red-flag: rgba(232,72,85,.15);
+  --red-border: rgba(232,72,85,.3);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--navy);
+  color:var(--text);
+  overflow-x:hidden;
+}
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(15,184,150,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(15,184,150,.03) 1px,transparent 1px);
+  background-size:44px 44px;
+  pointer-events:none;
+  z-index:0;
+}
+/* ── NAV ── */
+.navbar-custom{
+  background:rgba(6,14,26,.93);
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:1000;
+  padding:.85rem 0;
+}
+.brand-logo{
+  font-family:'Space Mono',monospace;
+  font-size:1.1rem;
+  color:var(--accent3);
+  display:flex;align-items:center;gap:.6rem;
+  text-decoration:none;
+}
+.brand-icon{
+  width:36px;height:36px;
+  background:linear-gradient(135deg,var(--accent),var(--accent3));
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;color:#fff;
+}
+.nav-pill{
+  color:var(--text-muted)!important;
+  font-size:.82rem;font-weight:500;
+  padding:.38rem .85rem;border-radius:20px;
+  transition:all .25s;text-decoration:none;
+}
+.nav-pill:hover,.nav-pill.active{
+  color:var(--accent3)!important;
+  background:var(--glow);
+}
+.classified-badge{
+  background:rgba(232,72,85,.18);
+  border:1px solid rgba(232,72,85,.35);
+  color:#f08090;
+  font-family:'Space Mono',monospace;
+  font-size:.63rem;letter-spacing:1.5px;
+  padding:.28em .75em;border-radius:6px;
+}
+/* ── HERO ── */
+.hero-section{
+  padding:7rem 0 4.5rem;
+  position:relative;overflow:hidden;
+}
+.hero-orb1{
+  position:absolute;width:700px;height:700px;border-radius:50%;
+  background:radial-gradient(circle,rgba(15,184,150,.1) 0%,transparent 65%);
+  top:-180px;right:-180px;pointer-events:none;
+}
+.hero-orb2{
+  position:absolute;width:400px;height:400px;border-radius:50%;
+  background:radial-gradient(circle,rgba(232,72,85,.07) 0%,transparent 65%);
+  bottom:-80px;left:-80px;pointer-events:none;
+}
+.label-tag{
+  font-family:'Space Mono',monospace;
+  font-size:.68rem;letter-spacing:2px;color:var(--accent2);
+  background:var(--glow);border:1px solid var(--border);
+  padding:.3em 1em;border-radius:20px;display:inline-block;
+  margin-bottom:1.4rem;
+}
+.hero-title{
+  font-family:'DM Sans',sans-serif;
+  font-size:clamp(2.2rem,4.5vw,3.8rem);
+  font-weight:700;line-height:1.08;
+  letter-spacing:-1.5px;margin-bottom:1.4rem;
+}
+.hero-title .grad{
+  background:linear-gradient(90deg,var(--accent2),var(--accent3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero-title .red-grad{
+  background:linear-gradient(90deg,#e84855,#f5a090);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero-sub{
+  color:var(--text-muted);
+  font-size:1rem;max-width:560px;line-height:1.75;
+  margin-bottom:2.2rem;
+}
+.btn-primary-cyber{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none;color:#fff;font-weight:600;
+  padding:.72rem 1.8rem;border-radius:12px;font-size:.92rem;
+  transition:all .3s;
+  box-shadow:0 4px 22px rgba(15,184,150,.28);
+  text-decoration:none;display:inline-block;
+}
+.btn-primary-cyber:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 32px rgba(15,184,150,.42);color:#fff;
+}
+.btn-outline-cyber{
+  border:1px solid var(--border);color:var(--text-muted);
+  background:transparent;padding:.72rem 1.8rem;
+  border-radius:12px;font-weight:500;transition:all .3s;
+  text-decoration:none;display:inline-block;font-size:.92rem;
+}
+.btn-outline-cyber:hover{
+  border-color:var(--accent2);color:var(--accent2);
+  background:var(--glow);
+}
+/* ── STATS STRIP ── */
+.stats-strip{
+  background:var(--glass);
+  border:1px solid var(--border);
+  border-radius:20px;padding:1.5rem 2rem;
+  backdrop-filter:blur(14px);
+}
+.stat-item{
+  text-align:center;padding:0 1.2rem;
+  border-right:1px solid var(--border);
+}
+.stat-item:last-child{border-right:none;}
+.stat-number{
+  font-family:'Space Mono',monospace;
+  font-size:1.6rem;font-weight:700;
+  background:linear-gradient(135deg,var(--accent2),var(--accent3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  display:block;
+}
+.stat-number.red-num{
+  background:linear-gradient(135deg,#e84855,#f5a090);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.stat-label{font-size:.75rem;color:var(--text-muted);letter-spacing:.5px;margin-top:.2rem;}
+/* ── GLASS CARD ── */
+.glass-card{
+  background:var(--glass);
+  border:1px solid var(--border);
+  border-radius:16px;
+  backdrop-filter:blur(12px);
+  transition:all .3s;
+  position:relative;overflow:hidden;
+}
+.glass-card:hover{
+  border-color:rgba(15,184,150,.3);
+  box-shadow:0 12px 40px rgba(15,184,150,.1);
+  transform:translateY(-3px);
+}
+.glass-card.danger-card{
+  border-color:var(--red-border);
+  background:rgba(10,22,34,.8);
+}
+.glass-card.danger-card:hover{
+  border-color:rgba(232,72,85,.45);
+  box-shadow:0 12px 40px rgba(232,72,85,.12);
+}
+.card-accent-bar{
+  position:absolute;top:0;left:0;right:0;height:3px;
+}
+.bar-teal{background:linear-gradient(90deg,var(--accent),var(--accent3));}
+.bar-red{background:linear-gradient(90deg,#e84855,#f5a623);}
+.bar-blue{background:linear-gradient(90deg,#3a6cf4,#6ab0f5);}
+.bar-warn{background:linear-gradient(90deg,#f5a623,#f7d474);}
+/* ── SECTION ── */
+.section{padding:5.5rem 0;}
+.section-label{
+  font-family:'Space Mono',monospace;
+  font-size:.68rem;letter-spacing:2.5px;color:var(--accent2);
+  margin-bottom:.6rem;display:block;
+}
+.section-title{
+  font-size:clamp(1.6rem,3vw,2.4rem);font-weight:700;
+  letter-spacing:-1px;margin-bottom:.8rem;
+}
+.section-divider{
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--border),transparent);
+}
+/* ── ANIMATED FLOW ── */
+@keyframes flowPulse{
+  0%{transform:translateX(-100%);opacity:0;}
+  10%{opacity:1;}
+  90%{opacity:1;}
+  100%{transform:translateX(200%);opacity:0;}
+}
+@keyframes nodePulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(15,184,150,.4);}
+  50%{box-shadow:0 0 0 10px rgba(15,184,150,0);}
+}
+@keyframes dangerPulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(232,72,85,.4);}
+  50%{box-shadow:0 0 0 10px rgba(232,72,85,0);}
+}
+@keyframes scanLine{
+  0%{top:0;opacity:1;}
+  90%{opacity:.8;}
+  100%{top:100%;opacity:0;}
+}
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(24px);}
+  to{opacity:1;transform:translateY(0);}
+}
+@keyframes blink{
+  0%,100%{opacity:1;}50%{opacity:.3;}
+}
+@keyframes rotate{
+  from{transform:rotate(0deg);}
+  to{transform:rotate(360deg);}
+}
+.fade-up{opacity:0;animation:fadeUp .7s ease forwards;}
+.d1{animation-delay:.1s;}.d2{animation-delay:.2s;}.d3{animation-delay:.3s;}.d4{animation-delay:.4s;}.d5{animation-delay:.5s;}
+/* ── FLOW VIZ ── */
+.flow-container{
+  background:rgba(6,14,26,.8);
+  border:1px solid var(--border);
+  border-radius:20px;padding:2.5rem 2rem;
+  position:relative;overflow:hidden;
+}
+.scan-overlay{
+  position:absolute;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--accent2),transparent);
+  animation:scanLine 4s ease-in-out infinite;
+  box-shadow:0 0 12px var(--accent2);
+  z-index:10;
+}
+.flow-row{display:flex;align-items:center;gap:0;margin-bottom:1.5rem;}
+.flow-node{
+  flex-shrink:0;
+  width:100px;min-height:72px;
+  border-radius:12px;
+  background:rgba(13,46,66,.7);
+  border:1px solid var(--border);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:.25rem;padding:.5rem;
+  transition:all .3s;cursor:pointer;
+  text-align:center;
+}
+.flow-node:hover{
+  border-color:var(--accent2);
+  background:rgba(15,184,150,.1);
+}
+.flow-node.active-node{
+  border-color:var(--accent2);
+  box-shadow:0 0 20px rgba(15,184,150,.3);
+  animation:nodePulse 2s infinite;
+}
+.flow-node.danger-node{
+  border-color:var(--red-border);
+  background:rgba(232,72,85,.08);
+}
+.flow-node.danger-node:hover,.flow-node.danger-node.active-node{
+  border-color:#e84855;
+  box-shadow:0 0 20px rgba(232,72,85,.3);
+  animation:dangerPulse 2s infinite;
+}
+.fn-icon{font-size:1.3rem;}
+.fn-label{font-size:.65rem;font-weight:600;letter-spacing:.5px;color:var(--text);}
+.fn-sub{font-size:.58rem;color:var(--text-muted);}
+.flow-pipe{
+  flex:1;height:4px;
+  background:rgba(255,255,255,.05);
+  border-radius:2px;position:relative;overflow:hidden;
+}
+.flow-pipe::after{
+  content:'';position:absolute;
+  left:0;top:0;height:100%;width:35%;
+  background:linear-gradient(90deg,transparent,var(--accent2),transparent);
+  animation:flowPulse 2.2s linear infinite;
+}
+.flow-pipe.danger-pipe::after{
+  background:linear-gradient(90deg,transparent,#e84855,transparent);
+  animation-delay:.5s;
+}
+.pipe-label{
+  font-size:.6rem;color:var(--text-muted);
+  text-align:center;margin-top:.2rem;
+  font-family:'Space Mono',monospace;
+}
+/* ── RED FLAG CARDS ── */
+.rf-card{
+  background:rgba(10,20,32,.7);
+  border:1px solid var(--red-border);
+  border-radius:12px;padding:1rem 1.2rem;
+  margin-bottom:.7rem;
+  transition:all .25s;cursor:default;
+  position:relative;overflow:hidden;
+}
+.rf-card:hover{
+  border-color:#e84855;
+  background:rgba(232,72,85,.06);
+  transform:translateX(4px);
+}
+.rf-card::before{
+  content:'';
+  position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:var(--danger);
+  border-radius:3px 0 0 3px;
+}
+.rf-badge{
+  font-family:'Space Mono',monospace;font-size:.6rem;
+  background:rgba(232,72,85,.18);border:1px solid rgba(232,72,85,.3);
+  color:#f08090;padding:.2em .6em;border-radius:5px;
+  margin-right:.5rem;
+}
+.rf-title{font-size:.88rem;font-weight:600;margin-bottom:.2rem;}
+.rf-text{font-size:.8rem;color:var(--text-muted);line-height:1.5;}
+/* ── TIMELINE ── */
+.timeline-wrap{position:relative;padding-left:3rem;}
+.timeline-wrap::before{
+  content:'';position:absolute;
+  left:1.1rem;top:0;bottom:0;width:2px;
+  background:linear-gradient(180deg,var(--accent2),rgba(15,184,150,.1));
+}
+.tl-item{position:relative;margin-bottom:2rem;}
+.tl-dot{
+  position:absolute;left:-2.1rem;top:0;
+  width:28px;height:28px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--accent3));
+  border:2px solid var(--navy);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.65rem;font-weight:700;color:#fff;
+  font-family:'Space Mono',monospace;
+  box-shadow:0 0 16px rgba(15,184,150,.4);
+}
+.tl-period{
+  font-family:'Space Mono',monospace;
+  font-size:.68rem;color:var(--accent2);
+  letter-spacing:1px;margin-bottom:.3rem;
+}
+.tl-title{font-weight:700;font-size:.95rem;margin-bottom:.3rem;}
+.tl-text{font-size:.83rem;color:var(--text-muted);line-height:1.65;}
+/* ── CASE STUDY CARDS ── */
+.case-card{
+  background:var(--glass);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:1.6rem;
+  height:100%;
+  transition:all .3s;
+}
+.case-card:hover{
+  border-color:rgba(15,184,150,.3);
+  box-shadow:0 12px 40px rgba(15,184,150,.1);
+}
+.case-number{
+  font-family:'Space Mono',monospace;
+  font-size:.65rem;color:var(--text-muted);
+  letter-spacing:1.5px;margin-bottom:.5rem;
+}
+.case-title{font-size:1rem;font-weight:700;margin-bottom:.5rem;}
+.case-jurisdiction{
+  font-size:.75rem;color:var(--accent2);
+  margin-bottom:.75rem;font-style:italic;
+}
+.case-text{font-size:.83rem;color:var(--text-muted);line-height:1.65;margin-bottom:1rem;}
+.case-tags{display:flex;flex-wrap:wrap;gap:.4rem;}
+.case-tag{
+  font-size:.7rem;
+  background:var(--glow);
+  border:1px solid var(--border);
+  color:var(--text-muted);
+  padding:.2em .7em;border-radius:8px;
+}
+/* ── TOOL CARDS ── */
+.tool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:.8rem;}
+.tool-item{
+  background:rgba(10,22,36,.7);
+  border:1px solid var(--border);
+  border-radius:12px;padding:1rem 1.2rem;
+  transition:all .25s;
+}
+.tool-item:hover{
+  border-color:rgba(15,184,150,.3);
+  background:var(--glow);
+  transform:translateY(-2px);
+}
+.tool-cat{
+  font-family:'Space Mono',monospace;
+  font-size:.6rem;letter-spacing:1.5px;
+  color:var(--accent2);margin-bottom:.3rem;
+}
+.tool-name{font-size:.88rem;font-weight:600;margin-bottom:.2rem;}
+.tool-desc{font-size:.75rem;color:var(--text-muted);line-height:1.5;}
+/* ── PROGRESS ── */
+.prog-bar-wrap{margin-bottom:1rem;}
+.prog-header{
+  display:flex;justify-content:space-between;
+  font-size:.8rem;margin-bottom:.35rem;
+}
+.prog-val{
+  font-family:'Space Mono',monospace;
+  font-size:.75rem;color:var(--accent2);
+}
+.progress{height:6px;background:rgba(255,255,255,.06);border-radius:3px;}
+.progress-bar{border-radius:3px;transition:width 1.5s ease;}
+/* ── INTERACTIVE TABS ── */
+.custom-tabs{
+  border:1px solid var(--border);
+  background:rgba(10,22,36,.6);
+  border-radius:14px;padding:.35rem;
+  display:flex;gap:.25rem;flex-wrap:wrap;
+  backdrop-filter:blur(10px);
+}
+.custom-tab{
+  flex:1;min-width:fit-content;
+  padding:.45rem 1rem;
+  border-radius:10px;
+  font-size:.8rem;font-weight:500;
+  border:none;background:transparent;
+  color:var(--text-muted);cursor:pointer;
+  transition:all .25s;white-space:nowrap;
+}
+.custom-tab.active,.custom-tab:hover{
+  background:var(--glow);color:var(--accent2);
+}
+.custom-tab.active{
+  background:linear-gradient(135deg,rgba(15,184,150,.18),rgba(20,196,162,.12));
+  color:var(--accent3);font-weight:600;
+}
+.tab-content-panel{display:none;}
+.tab-content-panel.active{display:block;}
+/* ── RISK METER ── */
+.risk-meter{
+  position:relative;
+  background:rgba(10,22,36,.8);
+  border:1px solid var(--border);
+  border-radius:14px;padding:1.2rem;
+  text-align:center;
+}
+.meter-title{font-size:.75rem;color:var(--text-muted);margin-bottom:.5rem;}
+.meter-val{
+  font-family:'Space Mono',monospace;
+  font-size:1.8rem;font-weight:700;
+}
+.meter-val.high{
+  background:linear-gradient(135deg,#e84855,#f5a623);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.meter-label{font-size:.7rem;color:var(--text-muted);}
+/* ── ALERT BOX ── */
+.alert-cyber{
+  background:rgba(232,72,85,.08);
+  border:1px solid rgba(232,72,85,.28);
+  border-radius:12px;padding:1rem 1.2rem;
+  font-size:.85rem;color:var(--text);
+  margin-bottom:1rem;
+}
+.alert-cyber i{color:#e84855;margin-right:.5rem;}
+.alert-info-cyber{
+  background:rgba(15,184,150,.07);
+  border:1px solid var(--border);
+  border-radius:12px;padding:1rem 1.2rem;
+  font-size:.85rem;color:var(--text);
+  margin-bottom:1rem;
+}
+.alert-info-cyber i{color:var(--accent2);margin-right:.5rem;}
+/* ── PULSE ── */
+@keyframes pulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(15,184,150,.35);}
+  50%{box-shadow:0 0 0 9px rgba(15,184,150,0);}
+}
+.pulse-dot{
+  display:inline-block;width:8px;height:8px;
+  border-radius:50%;background:var(--accent2);
+  animation:pulse 2s infinite;margin-right:.4rem;
+}
+.pulse-dot.red{background:#e84855;
+  animation-name:dangerPulse;
+}
+/* ── FOOTER ── */
+.footer-section{
+  background:rgba(5,12,22,.9);
+  border-top:1px solid var(--border);
+  padding:2.5rem 0;
+}
+/* ── TOOLTIP-style hover card ── */
+.metric-hover{
+  cursor:help;
+  border-bottom:1px dashed var(--border);
+  transition:.2s;
+}
+.metric-hover:hover{color:var(--accent2);}
+/* ── MATRIX TABLE ── */
+.matrix-table{
+  width:100%;border-collapse:separate;border-spacing:0 .4rem;
+  font-size:.82rem;
+}
+.matrix-table th{
+  font-family:'Space Mono',monospace;font-size:.65rem;
+  letter-spacing:.8px;color:var(--text-muted);
+  padding:.5rem 1rem;font-weight:400;
+}
+.matrix-table td{
+  padding:.7rem 1rem;
+  background:rgba(255,255,255,.025);
+  border:1px solid rgba(255,255,255,.05);
+}
+.matrix-table td:first-child{border-radius:8px 0 0 8px;}
+.matrix-table td:last-child{border-radius:0 8px 8px 0;}
+.matrix-table tr:hover td{
+  background:rgba(15,184,150,.05);
+  border-color:var(--border);
+}
+.severity-high{color:#e84855;}
+.severity-med{color:#f5a623;}
+.severity-low{color:var(--accent2);}
+/* scrollbar */
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--navy);}
+::-webkit-scrollbar-thumb{background:var(--mid-teal);border-radius:3px;}
+@media(max-width:768px){
+  .stat-item{border-right:none;border-bottom:1px solid var(--border);padding:1rem 0;}
+  .stat-item:last-child{border-bottom:none;}
+  .flow-node{width:70px;min-height:60px;}
+  .fn-label{font-size:.55rem;}
+}
+/* ── SOLANA GRANT WORKSHOP ── */
+.sol-badge{
+  display:inline-flex;align-items:center;gap:.5rem;
+  font-family:'Space Mono',monospace;font-size:.66rem;letter-spacing:1.5px;
+  color:#e7dcff;background:linear-gradient(135deg,rgba(153,69,255,.18),rgba(20,241,149,.12));
+  border:1px solid rgba(153,69,255,.35);padding:.3em .9em;border-radius:20px;
+  text-decoration:none;transition:all .25s;
+}
+.sol-badge:hover{color:#fff;border-color:rgba(20,241,149,.5);box-shadow:0 0 18px rgba(153,69,255,.25);}
+.sol-dot{width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,#9945ff,#14f195);display:inline-block;}
+.workshop-card{
+  background:linear-gradient(135deg,rgba(153,69,255,.10),rgba(10,30,48,.82) 45%,rgba(20,241,149,.06));
+  border:1px solid rgba(153,69,255,.28);border-radius:20px;padding:2.2rem;
+  position:relative;overflow:hidden;backdrop-filter:blur(12px);
+}
+.workshop-card::after{
+  content:'';position:absolute;right:-90px;top:-90px;width:280px;height:280px;border-radius:50%;
+  background:radial-gradient(circle,rgba(153,69,255,.22),transparent 70%);pointer-events:none;
+}
+.workshop-card .sol-bar{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#9945ff,#14f195);}
+.ws-quote{
+  font-size:.92rem;color:var(--text);line-height:1.8;
+  border-left:2px solid #9945ff;padding:.2rem 0 .2rem 1.1rem;margin:1.2rem 0;
+}
+.audience-chip{
+  display:inline-flex;align-items:center;gap:.4rem;font-size:.78rem;
+  background:var(--glow);border:1px solid var(--border);color:var(--text);
+  padding:.35em .85em;border-radius:10px;margin:.2rem .25rem .2rem 0;
+}
+.audience-chip i{color:var(--accent3);}
+.gap-step{display:flex;gap:.85rem;align-items:flex-start;margin-bottom:1rem;}
+.gap-step .n{
+  width:30px;height:30px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  font-family:'Space Mono',monospace;font-size:.7rem;font-weight:700;color:#fff;
+  background:linear-gradient(135deg,var(--accent),var(--accent3));
+}
+.gap-step .t{font-weight:600;font-size:.9rem;margin-bottom:.15rem;}
+.gap-step .d{font-size:.8rem;color:var(--text-muted);line-height:1.55;}
+/* ── OPEN SOURCE STRIP ── */
+.oss-strip{border-top:1px solid var(--border);margin-top:2rem;padding-top:1.8rem;}
+.oss-strip p{font-size:.84rem;color:var(--text-muted);line-height:1.65;margin:0;max-width:620px;text-align:center;}
+@media(min-width:768px){.oss-strip p{text-align:left;}}
+.btn-github-glow{
+  background:linear-gradient(135deg,rgba(15,184,150,.14),rgba(153,69,255,.14));
+  border:1px solid rgba(20,196,162,.4);color:var(--accent3);font-weight:600;font-size:.88rem;
+  border-radius:12px;white-space:nowrap;transition:all .3s;
+  box-shadow:0 0 0 0 rgba(20,196,162,.0),0 4px 18px rgba(15,184,150,.15);
+  animation:ghGlow 3s ease-in-out infinite;
+}
+.btn-github-glow:hover{
+  color:#fff;border-color:var(--accent3);transform:translateY(-2px);
+  background:linear-gradient(135deg,var(--accent),#7a4bd8);
+  box-shadow:0 8px 30px rgba(15,184,150,.4);
+}
+@keyframes ghGlow{0%,100%{box-shadow:0 4px 18px rgba(15,184,150,.15);}50%{box-shadow:0 4px 26px rgba(153,69,255,.35);}}
+/* ── HELPERS used by cookie module ── */
+.mono{font-family:'Space Mono',monospace;}
+.text-muted-c{color:var(--text-muted)!important;}
+.hop-badge{font-family:'Space Mono',monospace;font-size:.68rem;color:var(--accent2);letter-spacing:1px;}
+.risk-badge{display:inline-flex;align-items:center;gap:.4rem;padding:.3em .9em;border-radius:20px;font-size:.75rem;font-weight:600;font-family:'Space Mono',monospace;}
+.risk-low{background:rgba(15,184,150,.15);color:var(--safe);border:1px solid rgba(15,184,150,.25);}
+.risk-med{background:rgba(245,166,35,.12);color:var(--warn);border:1px solid rgba(245,166,35,.25);}
+.risk-high{background:rgba(232,72,85,.12);color:var(--danger);border:1px solid rgba(232,72,85,.25);}
+.footer-section a.ck-link{color:var(--accent3);font-size:.8rem;text-decoration:none;}
+.footer-section a.ck-link:hover{text-decoration:underline;}
+/* ── COOKIE MODULE ── */
+.cookie-bar{position:fixed;left:50%;bottom:18px;transform:translate(-50%,140%);width:min(780px,calc(100% - 32px));z-index:1040;display:flex;align-items:center;gap:1rem;padding:.85rem 1rem .85rem 1.05rem;background:rgba(6,14,26,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--border);border-radius:18px;box-shadow:0 18px 50px rgba(0,0,0,.45);opacity:0;visibility:hidden;transition:transform .55s cubic-bezier(.2,.9,.25,1),opacity .4s,visibility .55s}
+.cookie-bar.show{transform:translate(-50%,0);opacity:1;visibility:visible}
+.cookie-bar::before{content:'';position:absolute;left:18px;right:18px;top:-1px;height:1px;background:linear-gradient(90deg,transparent,var(--accent3),transparent)}
+.cookie-ic{width:40px;height:40px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(26,140,122,.35),rgba(20,196,162,.12));color:var(--accent3);font-size:1.15rem;border:1px solid var(--border)}
+.cookie-txt{font-size:.79rem;color:var(--text-muted);line-height:1.5;flex:1}
+.cookie-txt strong{color:var(--text)}
+.cookie-actions{display:flex;gap:.4rem;flex-shrink:0}
+.ck-btn{display:inline-flex;align-items:center;gap:.3rem;font-size:.74rem;font-weight:600;padding:.42rem .8rem;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.03);color:var(--text-muted);transition:all .2s;white-space:nowrap;line-height:1.2}
+.ck-btn:hover{transform:translateY(-1px)}
+.ck-btn:active{transform:translateY(0) scale(.97)}
+.ck-btn:focus-visible{outline:2px solid var(--accent3);outline-offset:2px}
+.ck-accept{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent;color:#fff;box-shadow:0 4px 14px rgba(15,184,150,.3)}
+.ck-accept:hover{box-shadow:0 6px 20px rgba(15,184,150,.45);color:#fff}
+.ck-reject:hover{border-color:rgba(232,72,85,.45);color:#ff8a94;background:rgba(232,72,85,.08)}
+.ck-read:hover{border-color:var(--accent2);color:var(--accent3);background:var(--glow)}
+.cookie-fab{position:fixed;left:18px;bottom:18px;width:42px;height:42px;border-radius:12px;z-index:999;background:rgba(13,46,66,.85);backdrop-filter:blur(10px);border:1px solid var(--border);color:var(--accent3);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:all .3s}
+.cookie-fab.show{opacity:1;pointer-events:auto}
+.cookie-fab:hover{border-color:var(--accent2);box-shadow:0 0 18px rgba(15,184,150,.3)}
+body.ck-pending .cookie-fab{opacity:0;pointer-events:none}
+.ck-toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);z-index:1090;background:rgba(6,14,26,.96);border:1px solid var(--border);border-radius:12px;padding:.55rem 1rem;font-size:.8rem;color:var(--text);opacity:0;pointer-events:none;transition:all .35s;display:flex;align-items:center;gap:.5rem;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.ck-toast.show{opacity:1;transform:translate(-50%,0)}
+.modal-cyber .modal-content{background:linear-gradient(180deg,rgba(13,46,66,.98),rgba(6,14,26,.98));border:1px solid var(--border);border-radius:20px;color:var(--text);box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.modal-cyber .modal-header,.modal-cyber .modal-footer{border-color:var(--border)}
+.modal-cyber .btn-close{filter:invert(1) grayscale(1) brightness(1.6)}
+.modal-cyber .modal-body::-webkit-scrollbar{width:6px}
+.modal-cyber .modal-body::-webkit-scrollbar-thumb{background:var(--mid-teal);border-radius:6px}
+.modal-backdrop.show{opacity:.72}
+.pol-h{font-size:.92rem;font-weight:600;margin:1.3rem 0 .45rem;display:flex;align-items:center;gap:.55rem}
+.pol-h span{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--accent2)}
+.pol-p{font-size:.84rem;color:var(--text-muted);line-height:1.7;margin-bottom:.5rem}
+.ck-table-wrap{overflow-x:auto}
+.ck-table{width:100%;min-width:520px;font-size:.78rem;border-collapse:separate;border-spacing:0 .35rem}
+.ck-table th{font-family:'Space Mono',monospace;font-size:.62rem;letter-spacing:1px;color:var(--accent2);font-weight:400;padding:0 .6rem;text-transform:uppercase}
+.ck-table td{background:rgba(255,255,255,.03);padding:.55rem .6rem;color:var(--text-muted);border-top:1px solid var(--border);border-bottom:1px solid var(--border);vertical-align:top}
+.ck-table td:first-child{border-left:1px solid var(--border);border-radius:10px 0 0 10px;color:var(--accent3);font-family:'Space Mono',monospace}
+.ck-table td:last-child{border-right:1px solid var(--border);border-radius:0 10px 10px 0}
+.ck-live{background:rgba(6,14,26,.7);border:1px solid var(--border);border-radius:14px;padding:.9rem 1rem;font-family:'Space Mono',monospace;font-size:.72rem;color:var(--text-muted);word-break:break-all;line-height:1.7}
+.ck-live b{color:var(--accent3);font-weight:400}
+.ck-choices{display:grid;gap:.5rem}
+.ck-choice{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.75rem 1rem;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid var(--border);transition:border-color .25s}
+.ck-choice:hover{border-color:rgba(15,184,150,.35)}
+.ck-choice-d{font-size:.76rem;color:var(--text-muted)}
+.modal-cyber .form-switch .form-check-input{width:2.5em;height:1.3em;cursor:pointer;background-color:rgba(255,255,255,.08);border-color:var(--border);--bs-form-switch-bg:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%236b9fa0'/%3e%3c/svg%3e")}
+.modal-cyber .form-switch .form-check-input:checked{background-color:var(--accent2);border-color:var(--accent2);--bs-form-switch-bg:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e")}
+.modal-cyber .form-switch .form-check-input:focus{box-shadow:0 0 0 3px var(--glow)}
+.modal-cyber .form-switch .form-check-input:disabled{opacity:.6;cursor:not-allowed}
+@media (max-width:640px){
+  .cookie-bar{flex-wrap:wrap;gap:.7rem;bottom:12px}
+  .cookie-txt{flex-basis:calc(100% - 56px)}
+  .cookie-actions{width:100%}
+  .ck-btn{flex:1;justify-content:center}
+  .workshop-card{padding:1.4rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ NAVBAR ═══ -->
+<nav class="navbar-custom">
+  <div class="container-xl d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <a href="#" class="brand-logo">
+      <div class="brand-icon"><i class="fas fa-shield-halved"></i></div>
+      CHAINLOGIC<span style="color:var(--text-muted)">::</span>TF
+    </a>
+    <div class="d-none d-md-flex align-items-center gap-1">
+      <a href="#workshop" class="nav-pill">Workshop</a>
+      <a href="#overview" class="nav-pill">Overview</a>
+      <a href="#why-matters" class="nav-pill">Why It Matters</a>
+      <a href="#visualization" class="nav-pill">Flow Viz</a>
+      <a href="#methodology" class="nav-pill">Methodology</a>
+      <a href="#cases" class="nav-pill">Case Studies</a>
+      <a href="#tools" class="nav-pill">Tools</a>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <span class="pulse-dot red"></span>
+      <span class="classified-badge">FATF 2020 · FORENSIC REF</span>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero-section" id="home">
+  <div class="hero-orb1"></div>
+  <div class="hero-orb2"></div>
+  <div class="container-xl position-relative">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6 fade-up d1">
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+          <span class="label-tag mb-0">⚠ CRYPTO FORENSIC INTELLIGENCE GUIDE</span>
+          <a href="#workshop" class="sol-badge"><span class="sol-dot"></span>SOLANA FOUNDATION GRANT · WORKSHOP</a>
+        </div>
+        <h1 class="hero-title">
+          Financing of <span class="red-grad">Terrorism</span><br>
+          in <span class="grad">Crypto Investigations</span>
+        </h1>
+        <p class="hero-sub">
+          A practitioner's reference for detecting, tracing, and reporting terrorist financing activity through virtual assets — grounded in FATF red flag methodology and real-world investigation patterns.
+        </p>
+        <div class="d-flex gap-3 flex-wrap">
+          <a href="#overview" class="btn-primary-cyber">
+            <i class="fas fa-crosshairs me-2"></i>Begin Analysis
+          </a>
+          <a href="#visualization" class="btn-outline-cyber">
+            <i class="fas fa-diagram-project me-2"></i>Flow Viz
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-6 fade-up d3">
+        <div class="stats-strip">
+          <div class="row g-0">
+         
+            <div class="col-3">
+              <div class="stat-item">
+                <span class="stat-number" data-target="6">0</span>
+                <div class="stat-label">RED FLAG<br>CATEGORIES</div>
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="stat-item">
+                <span class="stat-number red-num" data-target="39">0</span>
+                <div class="stat-label">FATF MEMBER<br>JURISDICTIONS</div>
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="stat-item">
+                <span class="stat-number" data-target="5">0</span>
+                <div class="stat-label">FORENSIC INVEST.<br>PHASES</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Live risk meter -->
+        <div class="row g-2 mt-2">
+          <div class="col-4">
+            <div class="risk-meter">
+              <div class="meter-title">TF RISK LEVEL</div>
+              <div class="meter-val high">CRIT</div>
+              <div class="meter-label">Virtual Assets</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="risk-meter">
+              <div class="meter-title">VASP EXPOSURE</div>
+              <div class="meter-val high">HIGH</div>
+              <div class="meter-label">Cross-border</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="risk-meter">
+              <div class="meter-title">DETECTION GAP</div>
+              <div class="meter-val" style="font-size:1.6rem;color:var(--accent3)">WIDE</div>
+              <div class="meter-label">Regulatory lag</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═══ SOLANA GRANT WORKSHOP ═══ -->
+<section class="section" id="workshop">
+  <div class="container-xl">
+    <div class="row mb-4">
+      <div class="col-lg-9 fade-up d1">
+        <span class="section-label">// SECTION 00 · ABOUT THIS DASHBOARD</span>
+        <h2 class="section-title">Built for a <span style="background:linear-gradient(90deg,#9945ff,#14f195);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">Solana Foundation Grant</span> Workshop</h2>
+        <p style="color:var(--text-muted);font-size:.9rem;line-height:1.75;">
+          This dashboard is part of a hands-on forensic investigation workshop held under a Solana Foundation grant. It was designed as practitioner-grade teaching material for future legal professionals who will meet on-chain evidence in courtrooms, regulators' offices and compliance teams.
+        </p>
+      </div>
+    </div>
+    <div class="row g-4">
+      <div class="col-lg-7 fade-up d2">
+        <div class="workshop-card h-100">
+          <div class="sol-bar"></div>
+          <div class="position-relative" style="z-index:1">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <span class="sol-badge" style="pointer-events:none"><span class="sol-dot"></span>PROJECT DETAILS · THE PROBLEM</span>
+            </div>
+            <div class="ws-quote">
+              Future legal professionals — prosecutors, judges, compliance officers, and regulators — graduate without any practical understanding of how blockchain ecosystems are weaponized for <strong style="color:#f08090">terrorism financing (TF)</strong> and <strong style="color:#f08090">international sanctions evasion</strong>.
+            </div>
+            <p style="font-size:.86rem;color:var(--text-muted);line-height:1.75;">
+              This creates a critical enforcement gap: courts and regulators are confronted with on-chain evidence they cannot evaluate, and bad actors operate with near-impunity in jurisdictions where legal expertise hasn't caught up with Web3 realities.
+            </p>
+            <div class="alert-cyber mt-3 mb-3">
+              <i class="fas fa-triangle-exclamation"></i>
+              <strong>Concrete, urgent example — the A7A5 token:</strong> a ruble-backed token documented as a mechanism for Russia to bypass OFAC sanctions through a crypto-energy transfer network involving Kyrgyz, Chinese, and Hong Kong nodes.
+            </div>
+            <p style="font-size:.86rem;color:var(--text-muted);line-height:1.75;margin-bottom:0;">
+              Without accessible, practitioner-grade educational infrastructure on Solana's forensic landscape, the next generation of law professionals will remain blind to these schemes. It is imperative for us, experts in our field, to contribute and share our expertise in the best way possible — and hands-on workshops are the best way to impact the community.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-5 fade-up d3">
+        <div class="glass-card p-4 h-100">
+          <div class="card-accent-bar bar-teal"></div>
+          <div class="mt-2">
+            <div style="font-family:'Space Mono',monospace;font-size:.68rem;color:var(--accent2);letter-spacing:1.5px;margin-bottom:.9rem;">WHO THE WORKSHOP IS FOR</div>
+            <div class="mb-4">
+              <span class="audience-chip"><i class="bi bi-briefcase"></i>Prosecutors</span>
+              <span class="audience-chip"><i class="bi bi-bank"></i>Judges</span>
+              <span class="audience-chip"><i class="bi bi-clipboard-check"></i>Compliance officers</span>
+              <span class="audience-chip"><i class="bi bi-shield-check"></i>Regulators</span>
+              <span class="audience-chip"><i class="bi bi-mortarboard"></i>Law students</span>
+            </div>
+            <div style="font-family:'Space Mono',monospace;font-size:.68rem;color:var(--accent2);letter-spacing:1.5px;margin-bottom:.9rem;">CLOSING THE ENFORCEMENT GAP</div>
+            <div class="gap-step"><div class="n">01</div><div><div class="t">Recognize the typologies</div><div class="d">How TF and sanctions-evasion flows move through virtual assets, mapped to FATF red flags.</div></div></div>
+            <div class="gap-step"><div class="n">02</div><div><div class="t">Read on-chain evidence</div><div class="d">Follow the flow visualizations and case studies the way an investigator would.</div></div></div>
+            <div class="gap-step mb-0"><div class="n">03</div><div><div class="t">Evaluate it in legal process</div><div class="d">Connect forensic findings to STRs, MLA requests, asset freezes and prosecution packages.</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═══ OVERVIEW ═══ -->
+<section class="section" id="overview">
+  <div class="container-xl">
+    <div class="row g-4">
+      <div class="col-lg-4 fade-up d1">
+        <span class="section-label">// SECTION 01</span>
+        <h2 class="section-title">Overview & <span style="color:var(--accent3)">Definitions</span></h2>
+        <p style="color:var(--text-muted);font-size:.9rem;line-height:1.75;margin-bottom:1.2rem;">
+          Terrorist financing (TF) through virtual assets represents one of the most complex investigative challenges in modern crypto forensics. Unlike traditional money laundering, TF flows may involve <em>small amounts</em> from legitimate sources, making pattern recognition critical.
+        </p>
+        <div class="alert-cyber">
+          <i class="fas fa-triangle-exclamation"></i>
+          <strong>Key Distinction:</strong> TF funds may originate from <em>clean</em> sources — detection relies on destination and behavioral patterns, not just origin tracing.
+        </div>
+        <div class="alert-info-cyber">
+          <i class="fas fa-info-circle"></i>
+          VASPs are legally required to file Suspicious Transaction Reports (STRs) with FIUs when TF indicators are detected.
+        </div>
+      </div>
+      <div class="col-lg-8">
+        <div class="row g-3">
+          <!-- Definition cards -->
+          <div class="col-md-6 fade-up d2">
+            <div class="glass-card p-3 h-100">
+              <div class="card-accent-bar bar-red"></div>
+              <div class="mt-2">
+                <div style="font-size:1.5rem;margin-bottom:.5rem;">☣️</div>
+                <div style="font-family:'Space Mono',monospace;font-size:.68rem;color:var(--danger);letter-spacing:1px;margin-bottom:.4rem;">TERRORIST FINANCING</div>
+                <p style="font-size:.84rem;color:var(--text-muted);line-height:1.6;">The provision or collection of funds — from any source, clean or illicit — with the intention that they be used to support terrorist acts, organizations, or individual terrorists. Virtual assets enable rapid, borderless, pseudonymous transfers.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 fade-up d2">
+            <div class="glass-card p-3 h-100">
+              <div class="card-accent-bar bar-teal"></div>
+              <div class="mt-2">
+                <div style="font-size:1.5rem;margin-bottom:.5rem;">🔍</div>
+                <div style="font-family:'Space Mono',monospace;font-size:.68rem;color:var(--accent2);letter-spacing:1px;margin-bottom:.4rem;">VIRTUAL ASSET (VA)</div>
+                <p style="font-size:.84rem;color:var(--text-muted);line-height:1.6;">A digital representation of value that can be digitally traded, transferred, or used for payment. Includes cryptocurrencies (BTC, ETH, Monero), stablecoins, and tokens — all exploitable for TF layering.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 fade-up d3">
+            <div class="glass-card p-3 h-100">
+              <div class="card-accent-bar bar-blue"></div>
+              <div class="mt-2">
+                <div style="font-size:1.5rem;margin-bottom:.5rem;">🏦</div>
+                <div style="font-family:'Space Mono',monospace;font-size:.68rem;color:#6ab0f5;letter-spacing:1px;margin-bottom:.4rem;">VASP</div>
+                <p style="font-size:.84rem;color:var(--text-muted);line-height:1.6;">Virtual Asset Service Provider — exchanges, custodians, wallet providers. Primary AML/CTF gatekeepers. TF actors exploit VASPs in jurisdictions with weak KYC controls as relay points.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 fade-up d3">
+            <div class="glass-card p-3 h-100">
+              <div class="card-accent-bar bar-warn"></div>
+              <div class="mt-2">
+                <div style="font-size:1.5rem;margin-bottom:.5rem;">📋</div>
+                <div style="font-family:'Space Mono',monospace;font-size:.68rem;color:var(--warn);letter-spacing:1px;margin-bottom:.4rem;">STR / SAR</div>
+                <p style="font-size:.84rem;color:var(--text-muted);line-height:1.6;">Suspicious Transaction Report — the primary intelligence product filed by VASPs and FIs with Financial Intelligence Units when TF red flags are identified. Triggers LEA investigation.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress bars - prevalence -->
+    <div class="row g-4 mt-3">
+      <div class="col-lg-6 fade-up d2">
+        <div class="glass-card p-4">
+          <div style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--accent2);letter-spacing:1.5px;margin-bottom:1.2rem;">TF MISUSE PREVALENCE BY CRIME TYPE</div>
+          <div class="prog-bar-wrap">
+            <div class="prog-header"><span>Illicit Drug Trafficking (VA layer)</span><span class="prog-val" data-pval="72">0%</span></div>
+            <div class="progress"><div class="progress-bar" style="background:linear-gradient(90deg,var(--accent),var(--accent3));width:0%" data-width="72"></div></div>
+          </div>
+          <div class="prog-bar-wrap">
+            <div class="prog-header"><span>Fraud, Scams & Ransomware</span><span class="prog-val" data-pval="65">0%</span></div>
+            <div class="progress"><div class="progress-bar" style="background:linear-gradient(90deg,#3a6cf4,#6ab0f5);width:0%" data-width="65"></div></div>
+          </div>
+          <div class="prog-bar-wrap">
+            <div class="prog-header"><span>Sanctions Evasion via VAs</span><span class="prog-val" data-pval="48">0%</span></div>
+            <div class="progress"><div class="progress-bar" style="background:linear-gradient(90deg,#e84855,#f5a623);width:0%" data-width="48"></div></div>
+          </div>
+          <div class="prog-bar-wrap">
+            <div class="prog-header"><span>Terrorist Financing (Fundraising)</span><span class="prog-val" data-pval="41">0%</span></div>
+            <div class="progress"><div class="progress-bar" style="background:linear-gradient(90deg,#e84855,#f08090);width:0%" data-width="41"></div></div>
+          </div>
+          <div class="prog-bar-wrap">
+            <div class="prog-header"><span>Foreign Terrorist Fighter (FTF) Transfers</span><span class="prog-val" data-pval="29">0%</span></div>
+            <div class="progress"><div class="progress-bar" style="background:linear-gradient(90deg,#f5a623,#f7d474);width:0%" data-width="29"></div></div>
+          </div>
+          <div style="font-size:.7rem;color:var(--text-muted);margin-top:.8rem;">Source: FATF case study analysis, 2017–2020</div>
+        </div>
+      </div>
+      <div class="col-lg-6 fade-up d3">
+        <div class="glass-card p-4 h-100">
+          <div style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--accent2);letter-spacing:1.5px;margin-bottom:1.2rem;">FORENSIC INVESTIGATOR'S PRIORITY MATRIX</div>
+          <table class="matrix-table">
+            <thead>
+              <tr>
+                <th>INDICATOR TYPE</th>
+                <th>SEVERITY</th>
+                <th>TF RELEVANCE</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Darknet marketplace exposure</td>
+                <td><span class="severity-high">● CRITICAL</span></td>
+                <td>Weapons, material support</td>
+              </tr>
+              <tr>
+                <td>Privacy coin conversion (Monero, Zcash)</td>
+                <td><span class="severity-high">● CRITICAL</span></td>
+                <td>Chain-breaking obfuscation</td>
+              </tr>
+              <tr>
+                <td>Mixing/tumbling services</td>
+                <td><span class="severity-high">● HIGH</span></td>
+                <td>Fund aggregation concealment</td>
+              </tr>
+              <tr>
+                <td>Weak-KYC jurisdiction VASP routing</td>
+                <td><span class="severity-med">● MEDIUM</span></td>
+                <td>Regulatory arbitrage</td>
+              </tr>
+              <tr>
+                <td>P2P platform unregistered activity</td>
+                <td><span class="severity-med">● MEDIUM</span></td>
+                <td>Off-exchange movement</td>
+              </tr>
+              <tr>
+                <td>Structuring below thresholds</td>
+                <td><span class="severity-low">● MONITOR</span></td>
+                <td>Threshold evasion (smurfing)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═══ WHY IT MATTERS ═══ -->
+<section class="section" id="why-matters">
+  <div class="container-xl">
+    <div class="row mb-4">
+      <div class="col-lg-8 fade-up d1">
+        <span class="section-label">// SECTION 02</span>
+        <h2 class="section-title">Why Terrorist Funding  in Crypto <span style="color:var(--accent3)">Matters</span> to Forensic Investigators</h2>
+        <p style="color:var(--text-muted);font-size:.9rem;line-height:1.7;">
+          The unique technical properties of virtual assets create both opportunity and hazard. Understanding <em>why</em> VAs are attractive for terrorist financing is the foundation of effective detection.
+        </p>
+      </div>
+    </div>
+    <div class="row g-3">
+      <!-- 6 pillar cards -->
+      <div class="col-md-6 col-lg-4 fade-up d1">
+        <div class="glass-card danger-card p-4 h-100">
+          <div class="card-accent-bar bar-red"></div>
+          <div class="mt-2">
+            <div style="font-size:2rem;margin-bottom:.75rem;">🌐</div>
+            <h5 style="font-weight:700;margin-bottom:.5rem;color:var(--text);">Borderless Speed</h5>
+            <p style="font-size:.83rem;color:var(--text-muted);line-height:1.65;">TF actors can transfer funds across international jurisdictions in seconds — outpacing traditional SWIFT monitoring and correspondent banking controls. A transaction from Europe to Southeast Asia settles in minutes, not days.</p>
+            <div class="mt-3 d-flex gap-2 flex-wrap">
+              <span class="case-tag">Rapid settlement</span>
+              <span class="case-tag">Cross-border</span>
+              <span class="case-tag">No intermediary</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4 fade-up d2">
+        <div class="glass-card danger-card p-4 h-100">
+          <div class="card-accent-bar bar-red"></div>
+          <div class="mt-2">
+            <div style="font-size:2rem;margin-bottom:.75rem;">🕵️</div>
+            <h5 style="font-weight:700;margin-bottom:.5rem;color:var(--text);">Pseudonymity Exploitation</h5>
+            <p style="font-size:.83rem;color:var(--text-muted);line-height:1.65;">Blockchain addresses provide pseudonymity rather than true anonymity — but layered through mixers, privacy coins, and multiple wallets, effective anonymity is achievable. LEAs must apply clustering analysis to pierce this veil.</p>
+            <div class="mt-3 d-flex gap-2 flex-wrap">
+              <span class="case-tag">Wallet clustering</span>
+              <span class="case-tag">Chain analysis</span>
+              <span class="case-tag">AEC coins</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4 fade-up d3">
+        <div class="glass-card danger-card p-4 h-100">
+          <div class="card-accent-bar bar-red"></div>
+          <div class="mt-2">
+            <div style="font-size:2rem;margin-bottom:.75rem;">💸</div>
+            <h5 style="font-weight:700;margin-bottom:.5rem;color:var(--text);">Small-Amount Fundraising</h5>
+            <p style="font-size:.83rem;color:var(--text-muted);line-height:1.65;">TF via crypto often involves aggregation of many small donations — well below reporting thresholds — from sympathizers in multiple jurisdictions. A terrorist operation may be funded by hundreds of micro-transactions undetectable individually.</p>
+            <div class="mt-3 d-flex gap-2 flex-wrap">
+              <span class="case-tag">Structuring</span>
+              <span class="case-tag">Crowdfunding</span>
+              <span class="case-tag">Smurfing</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4 fade-up d1">
+        <div class="glass-card p-4 h-100">
+          <div class="card-accent-bar bar-teal"></div>
+          <div class="mt-2">
+            <div style="font-size:2rem;margin-bottom:.75rem;">⚖️</div>
+            <h5 style="font-weight:700;margin-bottom:.5rem;color:var(--text);">Regulatory Arbitrage</h5>
+            <p style="font-size:.83rem;color:var(--text-muted);line-height:1.65;">TF actors deliberately route funds through VASPs operating in jurisdictions where FATF standards are not yet implemented. Forensic investigators must map the full jurisdictional chain to identify weak links and alert partner FIUs.</p>
+            <div class="mt-3 d-flex gap-2 flex-wrap">
+              <span class="case-tag">Weak-KYC VASPs</span>
+              <span class="case-tag">FIU cooperation</span>
+              <span class="case-tag">FATF gaps</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4 fade-up d2">
+        <div class="glass-card p-4 h-100">
+          <div class="card-accent-bar bar-warn"></div>
+          <div class="mt-2">
+            <div style="font-size:2rem;margin-bottom:.75rem;">🛒</div>
+            <h5 style="font-weight:700;margin-bottom:.5rem;color:var(--text);">Darknet Weapons Procurement</h5>
+            <p style="font-size:.83rem;color:var(--text-muted);line-height:1.65;">VAs are the primary payment mechanism on darknet markets for firearms, explosives, and CBRN precursors. Blockchain forensics can link wallet addresses to darknet market participation — a critical TF investigation pathway.</p>
+            <div class="mt-3 d-flex gap-2 flex-wrap">
+              <span class="case-tag">Darknet markets</span>
+              <span class="case-tag">TOR nodes</span>
+              <span class="case-tag">Weapons finance</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4 fade-up d3">
+        <div class="glass-card p-4 h-100">
+          <div class="card-accent-bar bar-blue"></div>
+          <div class="mt-2">
+            <div style="font-size:2rem;margin-bottom:.75rem;">✈️</div>
+            <h5 style="font-weight:700;margin-bottom:.5rem;color:var(--text);">Foreign Terrorist Fighter Financing</h5>
+            <p style="font-size:.83rem;color:var(--text-muted);line-height:1.65;">VAs are used to fund travel, logistics, and operational costs of Foreign Terrorist Fighters (FTFs). Investigation requires identifying VA-to-fiat cash-out points in conflict-adjacent jurisdictions and correlating with travel intelligence.</p>
+            <div class="mt-3 d-flex gap-2 flex-wrap">
+              <span class="case-tag">FTF tracking</span>
+              <span class="case-tag">Travel funding</span>
+              <span class="case-tag">Cross-intel</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═══ FLOW VISUALIZATION ═══ -->
+<section class="section" id="visualization">
+  <div class="container-xl">
+    <div class="row mb-4">
+      <div class="col-lg-8 fade-up d1">
+        <span class="section-label">// SECTION 03</span>
+        <h2 class="section-title">TF Attack Flow <span style="color:var(--accent3)">Visualization</span></h2>
+        <p style="color:var(--text-muted);font-size:.9rem;line-height:1.7;">
+          Interactive blockchain flow diagram showing how terrorist financing moves through virtual asset infrastructure. Click nodes to reveal forensic investigation tips.
+        </p>
+      </div>
+    </div>
+
+    <!-- Tab selector -->
+    <div class="custom-tabs mb-4 fade-up d2" style="max-width:680px;">
+      <button class="custom-tab active" onclick="showFlow('phase1')">Phase 1: Fundraising</button>
+      <button class="custom-tab" onclick="showFlow('phase2')">Phase 2: Layering</button>
+      <button class="custom-tab" onclick="showFlow('phase3')">Phase 3: Deployment</button>
+    </div>
+
+    <!-- PHASE 1 -->
+    <div id="flow-phase1" class="flow-container fade-up d3">
+      <div class="scan-overlay"></div>
+      <div style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--danger);letter-spacing:1.5px;margin-bottom:1.5rem;">
+        ▶ PHASE 1 — TF FUNDRAISING VIA VIRTUAL ASSETS
+      </div>
+      <div class="row g-3 align-items-center mb-3">
+        <!-- Row 1 -->
+        <div class="col-12">
+          <div class="d-flex align-items-center gap-2 flex-wrap">
+            <div class="flow-node danger-node" onclick="showNodeInfo('sympathizers')">
+              <div class="fn-icon">👥</div>
+              <div class="fn-label">SYMPATHIZERS</div>
+              <div class="fn-sub">Global donors</div>
+            </div>
+            <div style="flex:1;min-width:30px;">
+              <div class="flow-pipe danger-pipe"></div>
+              <div class="pipe-label">CRYPTO DONATIONS</div>
+            </div>
+            <div class="flow-node danger-node" onclick="showNodeInfo('crowdfund')">
+              <div class="fn-icon">📢</div>
+              <div class="fn-label">CROWDFUND</div>
+              <div class="fn-sub">Telegram/Signal</div>
+            </div>
+            <div style="flex:1;min-width:30px;">
+              <div class="flow-pipe danger-pipe"></div>
+              <div class="pipe-label">BTC/ETH/XMR</div>
+            </div>
+            <div class="flow-node danger-node active-node" onclick="showNodeInfo('collection')">
+              <div class="fn-icon">💰</div>
+              <div class="fn-label">COLLECTION WALLET</div>
+              <div class="fn-sub">Aggregation point</div>
+            </div>
+            <div style="flex:1;min-width:30px;">
+              <div class="flow-pipe danger-pipe"></div>
+              <div class="pipe-label">TRANSFER</div>
+            </div>
+            <div class="flow-node danger-node" onclick="showNodeInfo('weak-vasp')">
+              <div class="fn-icon">🏦</div>
+              <div class="fn-label">WEAK-KYC VASP</div>
+              <div class="fn-sub">High-risk jx</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="node-info" class="alert-cyber mt-3" style="display:none;">
+        <i class="fas fa-crosshairs"></i>
+        <span id="node-info-text"></span>
+      </div>
+      <div class="row g-3 mt-2">
+        <div class="col-md-4">
+          <div class="rf-card">
+            <div><span class="rf-badge">RF-T01</span><span class="rf-title">Small structured donations</span></div>
+            <div class="rf-text">Multiple micro-transactions from unrelated wallets — accumulation pattern targeting threshold evasion. Flag for STR if no business rationale.</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="rf-card">
+            <div><span class="rf-badge">RF-T02</span><span class="rf-title">Encrypted comms fundraising</span></div>
+            <div class="rf-text">VA addresses shared via Telegram, Signal, or darknet forums soliciting donations. Correlate with OSINT monitoring of extremist channels.</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="rf-card">
+            <div><span class="rf-badge">RF-T03</span><span class="rf-title">ICO / token-based TF</span></div>
+            <div class="rf-text">Initial Coin Offerings used as fundraising vehicles where investor identity is obscured. No personal data of contributors available — critical red flag.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHASE 2 -->
+    <div id="flow-phase2" class="flow-container fade-up d3" style="display:none;">
+      <div class="scan-overlay"></div>
+      <div style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--warn);letter-spacing:1.5px;margin-bottom:1.5rem;">
+        ▶ PHASE 2 — LAYERING & OBFUSCATION
+      </div>
+      <div class="d-flex align-items-center gap-2 flex-wrap mb-3">
+        <div class="flow-node danger-node" onclick="showNodeInfo('dirty-wallet')">
+          <div class="fn-icon">💼</div>
+          <div class="fn-label">SOURCE WALLET</div>
+          <div class="fn-sub">TF proceeds</div>
+        </div>
+        <div style="flex:1;min-width:30px;">
+          <div class="flow-pipe danger-pipe"></div>
+          <div class="pipe-label">SWAP</div>
+        </div>
+        <div class="flow-node danger-node active-node" onclick="showNodeInfo('mixer')">
+          <div class="fn-icon">🔀</div>
+          <div class="fn-label">MIXER/TUMBLER</div>
+          <div class="fn-sub">Helix, Wasabi</div>
+        </div>
+        <div style="flex:1;min-width:30px;">
+          <div class="flow-pipe danger-pipe"></div>
+          <div class="pipe-label">TO AEC</div>
+        </div>
+        <div class="flow-node danger-node" onclick="showNodeInfo('privacy-coin')">
+          <div class="fn-icon">🕶️</div>
+          <div class="fn-label">PRIVACY COIN</div>
+          <div class="fn-sub">XMR / ZEC</div>
+        </div>
+        <div style="flex:1;min-width:30px;">
+          <div class="flow-pipe danger-pipe"></div>
+          <div class="pipe-label">CHAIN HOP</div>
+        </div>
+        <div class="flow-node danger-node" onclick="showNodeInfo('multi-vasp')">
+          <div class="fn-icon">🔄</div>
+          <div class="fn-label">MULTI-VASP</div>
+          <div class="fn-sub">48+ accounts</div>
+        </div>
+      </div>
+      <div id="node-info" class="alert-cyber mt-3" style="display:none;"></div>
+      <div class="row g-3 mt-2">
+        <div class="col-md-4">
+          <div class="rf-card">
+            <div><span class="rf-badge">RF-A01</span><span class="rf-title">Mixing service usage</span></div>
+            <div class="rf-text">Direct or indirect links to known mixers (Helix, ChipMixer) in transaction history. Apply blockchain analytics to trace pre/post-mix clusters.</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="rf-card">
+            <div><span class="rf-badge">RF-A02</span><span class="rf-title">BTC→AEC conversion</span></div>
+            <div class="rf-text">Swapping transparent-chain assets to Monero/Zcash immediately after VASP deposit — chain-breaks forensic tracing. Document conversion timestamps.</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="rf-card">
+            <div><span class="rf-badge">RF-A03</span><span class="rf-title">55+ transfer hops (Case SK)</span></div>
+            <div class="rf-text">South Korea case: funds transferred 55 times across 48 accounts to obscure origin. Graph analysis essential — visualize entire hop chain.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHASE 3 -->
+    <div id="flow-phase3" class="flow-container fade-up d3" style="display:none;">
+      <div class="scan-overlay"></div>
+      <div style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--accent3);letter-spacing:1.5px;margin-bottom:1.5rem;">
+        ▶ PHASE 3 — OPERATIONAL DEPLOYMENT
+      </div>
+      <div class="d-flex align-items-center gap-2 flex-wrap mb-3">
+        <div class="flow-node" onclick="showNodeInfo('clean-wallet')">
+          <div class="fn-icon">🧹</div>
+          <div class="fn-label">LAYERED WALLET</div>
+          <div class="fn-sub">Post-obfuscation</div>
+        </div>
+        <div style="flex:1;min-width:30px;">
+          <div class="flow-pipe"></div>
+          <div class="pipe-label">CASH OUT</div>
+        </div>
+        <div class="flow-node danger-node active-node" onclick="showNodeInfo('atm')">
+          <div class="fn-icon">🏧</div>
+          <div class="fn-label">CRYPTO ATM</div>
+          <div class="fn-sub">High-risk zone</div>
+        </div>
+        <div style="flex:1;min-width:30px;">
+          <div class="flow-pipe danger-pipe"></div>
+          <div class="pipe-label">FIAT</div>
+        </div>
+        <div class="flow-node danger-node" onclick="showNodeInfo('darknet-purchase')">
+          <div class="fn-icon">🔫</div>
+          <div class="fn-label">DARKNET PURCHASE</div>
+          <div class="fn-sub">Weapons/supplies</div>
+        </div>
+        <div style="flex:1;min-width:30px;">
+          <div class="flow-pipe danger-pipe"></div>
+          <div class="pipe-label">DIRECT VA</div>
+        </div>
+        <div class="flow-node danger-node" onclick="showNodeInfo('ftf')">
+          <div class="fn-icon">✈️</div>
+          <div class="fn-label">FTF TRANSFER</div>
+          <div class="fn-sub">Conflict zone</div>
+        </div>
+      </div>
+      <div class="row g-3 mt-2">
+        <div class="col-md-4">
+          <div class="rf-card">
+            <div><span class="rf-badge">RF-D01</span><span class="rf-title">ATM in high-risk location</span></div>
+            <div class="rf-text">Repeated crypto ATM use in high-crime areas — especially when linked to accounts flagged for suspicious activity. Cross-reference ATM logs with wallet history.</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="rf-card">
+            <div><span class="rf-badge">RF-D02</span><span class="rf-title">Darknet marketplace links</span></div>
+            <div class="rf-text">Wallet addresses with direct exposure to known darknet markets (AlphaBay, Hydra). Use blockchain analytics to score wallet risk based on known entity clusters.</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="rf-card">
+            <div><span class="rf-badge">RF-D03</span><span class="rf-title">Conflict-zone VASP routing</span></div>
+            <div class="rf-text">Funds destined for VASPs or P2P contacts in conflict-adjacent jurisdictions with minimal AML controls. Immediate STR filing + LEA notification required.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═══ RED FLAG CATEGORIES (interactive tabs) ═══ -->
+<section class="section" id="red-flags">
+  <div class="container-xl">
+    <div class="row mb-4">
+      <div class="col-lg-8 fade-up d1">
+        <span class="section-label">// SECTION 03B</span>
+        <h2 class="section-title">Red Flag <span style="color:var(--danger)">Indicators</span> — TF Focus</h2>
+        <p style="color:var(--text-muted);font-size:.9rem;line-height:1.7;">Six FATF categories of red flag indicators, analyzed through a terrorist financing forensic lens.</p>
+      </div>
+    </div>
+    <div class="custom-tabs mb-4 fade-up d2">
+      <button class="custom-tab active" onclick="showRF('transactions')">Transactions</button>
+      <button class="custom-tab" onclick="showRF('patterns')">Patterns</button>
+      <button class="custom-tab" onclick="showRF('anonymity')">Anonymity</button>
+      <button class="custom-tab" onclick="showRF('identity')">Senders/Recipients</button>
+      <button class="custom-tab" onclick="showRF('source')">Source of Funds</button>
+      <button class="custom-tab" onclick="showRF('geo')">Geographical</button>
+    </div>
+    <div id="rf-transactions" class="tab-content-panel active fade-up d3">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="rf-card"><div><span class="rf-badge">T-01</span><span class="rf-title">Structuring under thresholds</span></div><div class="rf-text">VA transactions in small amounts specifically designed to avoid record-keeping thresholds — mirrors cash smurfing. In TF context, look for geographic clusters aligning with known extremist networks.</div></div>
+          <div class="rf-card"><div><span class="rf-badge">T-02</span><span class="rf-title">Multiple high-value transfers in 24h</span></div><div class="rf-text">Staggered, regular-pattern high-value transactions with long dormancy periods — ransomware signature, but also TF operational funding pattern. Timestamp correlation critical.</div></div>
+          <div class="rf-card"><div><span class="rf-badge">T-03</span><span class="rf-title">Immediate transfer to weak-KYC VASPs</span></div><div class="rf-text">Immediate forwarding of funds to VASPs in non-FATF-compliant jurisdictions after deposit — primary TF conduit technique. Map full jurisdictional chain.</div></div>
+        </div>
+        <div class="col-md-6">
+          <div class="rf-card"><div><span class="rf-badge">T-04</span><span class="rf-title">VA→VASP→immediate withdrawal</span></div><div class="rf-text">Using a VASP purely as a money transmission relay — depositing then immediately withdrawing without any exchange activity. Turns legitimate VASP into effective TF mixer.</div></div>
+          <div class="rf-card"><div><span class="rf-badge">T-05</span><span class="rf-title">Unnecessary multi-VA conversion</span></div><div class="rf-text">Converting BTC→ETH→XMR without logical portfolio rationale. Each conversion creates a new forensic trace point — but also adds obfuscation layers. Document conversion chain.</div></div>
+          <div class="rf-card"><div><span class="rf-badge">T-06</span><span class="rf-title">Stolen fund deposit (ZA case)</span></div><div class="rf-text">USD 108M case (South Africa): mule networks depositing at multiple FIs, then purchasing VA for immediate foreign transfer. Money mule indicators: shared IP/address patterns.</div></div>
+        </div>
+      </div>
+    </div>
+    <div id="rf-patterns" class="tab-content-panel fade-up d3">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="rf-card"><div><span class="rf-badge">P-01</span><span class="rf-title">Large initial deposit → full same-day trade</span></div><div class="rf-text">New VASP account with large opening deposit immediately traded in full — inconsistent with legitimate investment behavior. In TF, funds are moved rapidly before detection.</div></div>
+          <div class="rf-card"><div><span class="rf-badge">P-02</span><span class="rf-title">Multiple accounts, same IP address</span></div><div class="rf-text">Frequent transactions to same VA account from same IP — potential mule network coordination. Cross-reference IP with known TF infrastructure nodes.</div></div>
+          <div class="rf-card"><div><span class="rf-badge">P-03</span><span class="rf-title">Accumulation from unrelated wallets</span></div><div class="rf-text">Many small incoming transfers from unrelated wallets, consolidated then forwarded — classic TF crowdfunding aggregation. Graph node analysis essential.</div></div>
+        </div>
+        <div class="col-md-6">
+          <div class="rf-card"><div><span class="rf-badge">P-04</span><span class="rf-title">Exchange at operational loss</span></div><div class="rf-text">Conducting VA-fiat conversion at a calculated loss, ignoring abnormally high commission fees. TF actors prioritize speed/anonymity over profitability — a key behavioral differentiator.</div></div>
+          <div class="rf-card"><div><span class="rf-badge">P-05</span><span class="rf-title">Recurrent time-pattern transfers</span></div><div class="rf-text">Cayman Islands case: two transfers of USD 4.8M six minutes apart. Recurrent, time-bound patterns may indicate automated TF payment schedules or operational funding cycles.</div></div>
+          <div class="rf-card"><div><span class="rf-badge">P-06</span><span class="rf-title">New user — entire balance withdrawal</span></div><div class="rf-text">New account immediately attempting to withdraw or trade 100% of deposited balance — particularly suspicious when coupled with inconsistent KYC profile.</div></div>
+        </div>
+      </div>
+    </div>
+    <div id="rf-anonymity" class="tab-content-panel fade-up d3">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="rf-card"><div><span class="rf-badge">A-01</span><span class="rf-title">Privacy coin / AEC usage</span></div><div class="rf-text">Transaction in Monero (XMR), Zcash (ZEC), Dash, or Grin — especially when converting from transparent BTC on a VASP then immediately withdrawing. Highest TF anonymity risk indicator.</div></div>
+          <div class="rf-card"><div><span class="rf-badge">A-02</span><span class="rf-title">TOR / VPN / darknet access</span></div><div class="rf-text">Users accessing VASP platform via Tor exit nodes, known VPN IP ranges, or proxied domain registrations. AlphaBay case: TOR infrastructure concealed USD 1B+ in VA transactions.</div></div>
+          <div class="rf-card"><div><span class="rf-badge">A-03</span><span class="rf-title">Mixing/tumbling service exposure</span></div><div class="rf-text">Helix case: 350,000 BTC tumbled (~USD 300M). Any wallet with direct/indirect mixer exposure should be scored HIGH risk. Apply FATF travel rule compliance checks.</div></div>
+        </div>
+        <div class="col-md-6">
+          <div class="rf-card"><div><span class="rf-badge">A-04</span><span class="rf-title">P2P unregistered VASP activity</span></div><div class="rf-text">Operating as unlicensed P2P exchanger — charging premium fees, handling large VA volumes on behalf of third parties. Bypasses all AML/CTF controls entirely.</div></div>
+          <div class="rf-card"><div><span class="rf-badge">A-05</span><span class="rf-title">Multiple wallets — single IP control</span></div><div class="rf-text">Large number of apparently unrelated wallets controlled from same IP/MAC address — shell wallet networks used to conceal relationship between TF participants and coordinators.</div></div>
+          <div class="rf-card"><div><span class="rf-badge">A-06</span><span class="rf-title">Hardware/paper wallet border transit</span></div><div class="rf-text">Physical transport of VA across borders via hardware wallets — bypasses traditional currency declaration requirements. Correlate with border crossing intelligence and travel data.</div></div>
+        </div>
+      </div>
+    </div>
+    <div id="rf-identity" class="tab-content-panel fade-up d3">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="rf-card"><div><span class="rf-badge">I-01</span><span class="rf-title">Sanctioned jurisdiction IP origins</span></div><div class="rf-text">Transactions initiated from IP addresses in OFAC/UN sanctioned jurisdictions, or from IPs previously flagged in other STRs. Immediate escalation required — potential TF network node.</div></div>
+          <div class="rf-card"><div><span class="rf-badge">I-02</span><span class="rf-title">Forged KYC documents</span></div><div class="rf-text">USD 91M case: doctored IDs used to circumvent KYC at multiple exchanges. TF actors invest in sophisticated document fraud — use biometric verification and liveness detection.</div></div>
+          <div class="rf-card"><div><span class="rf-badge">I-03</span><span class="rf-title">VA address on criminal forums</span></div><div class="rf-text">Customer's wallet address appearing on public darknet forums, extremist fundraising threads, or ransom demand communications. Cross-reference with Chainalysis/Elliptic databases.</div></div>
+        </div>
+        <div class="col-md-6">
+          <div class="rf-card"><div><span class="rf-badge">I-04</span><span class="rf-title">Technology-naïve elderly users</span></div><div class="rf-text">Finland investment scam case: pensioners used as unwitting mules. In TF context, financially vulnerable individuals recruited as conduits. Identify for victim protection AND TF network mapping.</div></div>
+          <div class="rf-card"><div><span class="rf-badge">I-05</span><span class="rf-title">Illicit message field language</span></div><div class="rf-text">Transaction memo fields containing coded references to weapons, substances, or extremist terminology. Parse memo fields systematically — critical OSINT source often overlooked.</div></div>
+          <div class="rf-card"><div><span class="rf-badge">I-06</span><span class="rf-title">Repeated multi-IP login patterns</span></div><div class="rf-text">Customer logging into VASP from multiple distinct IP addresses per day — possible account takeover OR multiple-operator TF cell sharing a single account for fund movements.</div></div>
+        </div>
+      </div>
+    </div>
+    <div id="rf-source" class="tab-content-panel fade-up d3">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="rf-card"><div><span class="rf-badge">S-01</span><span class="rf-title">Sanctioned address exposure</span></div><div class="rf-text">Wallet transacting with OFAC-listed addresses or wallets linked to UN-sanctioned entities. Instant STR obligation. Use blockchain analytics to detect even indirect (2nd/3rd hop) exposure.</div></div>
+          <div class="rf-card"><div><span class="rf-badge">S-02</span><span class="rf-title">Darknet marketplace origin</span></div><div class="rf-text">Funds traceable to darknet market proceeds — even post-mixer. AlphaBay/DeepDotWeb cases demonstrate how FBI/DEA traced VA through mixer layers to identify TF beneficiaries.</div></div>
+          <div class="rf-card"><div><span class="rf-badge">S-03</span><span class="rf-title">Crypto-to-plastic (prepaid cards)</span></div><div class="rf-text">USD 35M in stolen VAs converted to prepaid debit cards — cash-equivalent instruments that bypass banking monitoring. Flag accounts using multiple debit cards linked to VA wallets.</div></div>
+        </div>
+        <div class="col-md-6">
+          <div class="rf-card"><div><span class="rf-badge">S-04</span><span class="rf-title">Shell company / ICO obscuration</span></div><div class="rf-text">DeepDotWeb case: USD 15M in kickback BTC laundered through shell company bank accounts. In TF, ICOs serve as plausible-deniability fundraising vehicles — no investor identity required.</div></div>
+          <div class="rf-card"><div><span class="rf-badge">S-05</span><span class="rf-title">Online gambling channel</span></div><div class="rf-text">VA transactions routed through online gambling platforms — chip-dumping or wash trading used to generate clean withdrawal records. A TF integration technique increasingly observed by FIUs.</div></div>
+          <div class="rf-card"><div><span class="rf-badge">S-06</span><span class="rf-title">Third-party mixer sourced funds</span></div><div class="rf-text">Customer's fund source is directly traced to a mixing service output wallet. No legitimate business explanation exists for this. Immediate STR + forensic wallet clustering warranted.</div></div>
+        </div>
+      </div>
+    </div>
+    <div id="rf-geo" class="tab-content-panel fade-up d3">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="rf-card"><div><span class="rf-badge">G-01</span><span class="rf-title">Non-resident VASP usage</span></div><div class="rf-text">Customer using a VASP registered in a different jurisdiction than where they reside or conduct business — without clear rationale. TF actors shop for weakest regulatory environment.</div></div>
+          <div class="rf-card"><div><span class="rf-badge">G-02</span><span class="rf-title">Zero-regulation jurisdiction routing</span></div><div class="rf-text">The "VASP migration" pattern: exchanges relocating operations from regulated jurisdictions (KR, JP, EU) to zero-regulation territories to escape AML controls. Document jurisdictional hop chain.</div></div>
+          <div class="rf-card"><div><span class="rf-badge">G-03</span><span class="rf-title">Unlicensed Bitcoin dealer (US case)</span></div><div class="rf-text">USD 3.29M in Bitcoin purchases through an Asian exchange after US account closure for suspicious activity. Unlicensed VA dealers are critical TF conduits — target for undercover LEA operations.</div></div>
+        </div>
+        <div class="col-md-6">
+          <div class="rf-card"><div><span class="rf-badge">G-04</span><span class="rf-title">Conflict-zone VASP destination</span></div><div class="rf-text">Funds flowing toward VASPs or P2P contacts in conflict-affected regions with weak state authority over financial supervision. Correlate with FTF travel intelligence from national security agencies.</div></div>
+          <div class="rf-card"><div><span class="rf-badge">G-05</span><span class="rf-title">Business offices in no-regulation zones</span></div><div class="rf-text">Customer establishing or relocating business offices to jurisdictions without VA regulation — without clear commercial rationale. Structural red flag for deliberate AML/CTF evasion architecture.</div></div>
+          <div class="rf-card"><div><span class="rf-badge">G-06</span><span class="rf-title">Cross-border precious metals link</span></div><div class="rf-text">USD case: Bitcoin proceeds exchanged for precious metals held in a neighboring country, imported below reporting thresholds. Multi-asset TF layering — requires cross-agency cooperation.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═══ METHODOLOGY ═══ -->
+<section class="section" id="methodology">
+  <div class="container-xl">
+    <div class="row">
+      <div class="col-lg-5 mb-5 fade-up d1">
+        <span class="section-label">// SECTION 04</span>
+        <h2 class="section-title">Investigation <span style="color:var(--accent3)">Methodology</span></h2>
+        <p style="color:var(--text-muted);font-size:.9rem;line-height:1.75;margin-bottom:1.5rem;">
+          A structured 5-phase forensic investigation framework for TF cases involving virtual assets, integrating FATF red flag analysis with operational blockchain intelligence.
+        </p>
+        <div class="alert-info-cyber">
+          <i class="fas fa-lightbulb"></i>
+          <strong>Investigator's Note:</strong> TF investigations differ from ML in that the <em>destination</em> of funds is the primary concern. Always trace forward — not just backward.
+        </div>
+        <!-- Mini progress -->
+        <div class="glass-card p-3 mt-3">
+          <div style="font-family:'Space Mono',monospace;font-size:.68rem;color:var(--accent2);letter-spacing:1px;margin-bottom:1rem;">INVESTIGATION COMPLETION STAGES</div>
+          <div class="prog-bar-wrap">
+            <div class="prog-header"><span>Intelligence Collection</span><span class="prog-val">Phase 1</span></div>
+            <div class="progress"><div class="progress-bar" style="background:linear-gradient(90deg,var(--accent),var(--accent3));width:0%" data-width="100"></div></div>
+          </div>
+          <div class="prog-bar-wrap">
+            <div class="prog-header"><span>On-chain Tracing</span><span class="prog-val">Phase 2</span></div>
+            <div class="progress"><div class="progress-bar" style="background:linear-gradient(90deg,#3a6cf4,#6ab0f5);width:0%" data-width="100"></div></div>
+          </div>
+          <div class="prog-bar-wrap">
+            <div class="prog-header"><span>Entity Attribution</span><span class="prog-val">Phase 3</span></div>
+            <div class="progress"><div class="progress-bar" style="background:linear-gradient(90deg,#f5a623,#f7d474);width:0%" data-width="100"></div></div>
+          </div>
+          <div class="prog-bar-wrap">
+            <div class="prog-header"><span>Legal Process / MLA</span><span class="prog-val">Phase 4</span></div>
+            <div class="progress"><div class="progress-bar" style="background:linear-gradient(90deg,#e84855,#f5a623);width:0%" data-width="100"></div></div>
+          </div>
+          <div class="prog-bar-wrap">
+            <div class="prog-header"><span>Asset Seizure & STR Filing</span><span class="prog-val">Phase 5</span></div>
+            <div class="progress"><div class="progress-bar" style="background:linear-gradient(90deg,var(--accent),var(--accent3));width:0%" data-width="100"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-7 fade-up d2">
+        <div class="timeline-wrap">
+          <div class="tl-item">
+            <div class="tl-dot">01</div>
+            <div class="tl-period">PHASE 01 — INTELLIGENCE COLLECTION</div>
+            <div class="tl-title">STR Triage & OSINT Pre-analysis</div>
+            <div class="tl-text">Receive and triage Suspicious Transaction Reports from VASPs and FIs. Cross-reference reported wallet addresses against known TF databases (OFAC SDN, UN Consolidated List, Chainalysis KYTE, Elliptic). Conduct OSINT sweep of customer profiles, social media, and darknet forum mentions. Establish preliminary TF hypothesis based on FATF red flag category mapping.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot">02</div>
+            <div class="tl-period">PHASE 02 — ON-CHAIN FORENSIC TRACING</div>
+            <div class="tl-title">Blockchain Transaction Graph Analysis</div>
+            <div class="tl-text">Deploy blockchain analytics tools (Chainalysis Reactor, TRM Labs, Crystal) to map the full transaction graph. Apply wallet clustering algorithms (common-input ownership heuristic, change address detection) to deanonymize entity relationships. Trace through mixing services using timing analysis and amount correlation. Document all hops with timestamps — forward trace to identify TF deployment addresses.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot">03</div>
+            <div class="tl-period">PHASE 03 — ENTITY ATTRIBUTION</div>
+            <div class="tl-title">VASP Data Requests & KYC Cross-match</div>
+            <div class="tl-text">Issue formal data requests to VASPs holding custody of identified wallets. Cross-match KYC data against watchlists, biometric databases, and document authenticity checks. Correlate IP addresses from VASP logs with VPN/TOR exit nodes, geolocation data, and device fingerprints. Request IP logs from ISPs via legal process where applicable. Identify money mule networks through shared biographic indicators.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot">04</div>
+            <div class="tl-period">PHASE 04 — INTERNATIONAL COOPERATION</div>
+            <div class="tl-title">FIU/LEA Deconfliction & MLA Process</div>
+            <div class="tl-text">Share intelligence packages with partner FIUs via Egmont Group secure communications. Initiate Mutual Legal Assistance (MLA) requests for evidence from foreign jurisdictions. Deconflict with parallel investigations to avoid compromising ongoing intelligence operations. Coordinate with Europol, Interpol, and FinCEN for cross-border TF network takedowns. Apply UN Security Council TF-related asset freeze obligations.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot">05</div>
+            <div class="tl-period">PHASE 05 — ENFORCEMENT & REPORTING</div>
+            <div class="tl-title">Asset Seizure, Prosecution Package & VASP STR Feedback</div>
+            <div class="tl-text">Execute coordinated asset freezes across jurisdictions. Compile forensic evidence package for prosecution — blockchain evidence, expert witness statements, chain-of-custody documentation. Provide TF typology feedback to originating VASPs to enhance their future detection capability. File final analytical report with national FIU for red flag database update. Publish typology guidance (de-identified) for sector-wide AML/CTF improvement.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═══ CASE STUDIES ═══ -->
+<section class="section" id="cases">
+  <div class="container-xl">
+    <div class="row mb-4">
+      <div class="col-lg-8 fade-up d1">
+        <span class="section-label">// SECTION 05</span>
+        <h2 class="section-title">Forensic <span style="color:var(--accent3)">Case Studies</span></h2>
+        <p style="color:var(--text-muted);font-size:.9rem;line-height:1.7;">Three reconstructed investigation scenarios derived from FATF-reported cases, presented through a TF forensic analysis lens.</p>
+      </div>
+    </div>
+    <div class="row g-4">
+      <div class="col-lg-4 fade-up d1">
+        <div class="case-card h-100">
+          <div class="case-number">CASE STUDY // 01 · SOUTH AFRICA / SOUTH KOREA</div>
+          <div class="card-accent-bar bar-red" style="border-radius:16px 16px 0 0;top:0;left:0;right:0;position:relative;height:3px;margin-bottom:.75rem;"></div>
+          <div class="case-title">Mule Network VA Laundering — USD 108M</div>
+          <div class="case-jurisdiction">🇿🇦 South Africa · 🇰🇷 South Korea</div>
+          <div class="case-text">150+ money mules purchased large VA amounts and immediately transferred to overseas VASPs. All accessed from shared IP addresses — indicating professional money launderer coordination. Korean variant: 55 transfers across 48 accounts to obscure KRW 400M phishing proceeds.<br><br><strong style="color:var(--accent2);">TF Forensic Lens:</strong> Mule network infrastructure mirrors TF operational security protocols. Shared IP clustering is the critical detection point — flag all accounts originating from same IP block. STR filing triggered successful fund seizure in Korean case.</div>
+          <div class="case-tags">
+            <span class="case-tag">Money mules</span>
+            <span class="case-tag">IP clustering</span>
+            <span class="case-tag">Multi-VASP transfer</span>
+            <span class="case-tag">STR success</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 fade-up d2">
+        <div class="case-card h-100">
+          <div class="case-number">CASE STUDY // 02 · UNITED STATES</div>
+          <div class="card-accent-bar bar-red" style="border-radius:16px 16px 0 0;top:0;left:0;right:0;position:relative;height:3px;margin-bottom:.75rem;"></div>
+          <div class="case-title">AlphaBay Darknet Takedown — USD 1B+</div>
+          <div class="case-jurisdiction">🇺🇸 United States · Multi-jurisdictional</div>
+          <div class="case-text">AlphaBay operated on TOR with 200,000 users, 40,000 vendors, facilitating over USD 1B in VA transactions for drugs, weapons, malware, and stolen documents 2015–2017. Funds traced through VA transaction graph from AlphaBay wallets to exchange accounts, then to bank accounts and physical assets.<br><br><strong style="color:var(--accent2);">TF Forensic Lens:</strong> Darknet marketplaces are primary weapons procurement channels for terrorist groups. VA tracing through TOR-originated wallets requires cooperation with Tor Project data and exchange subpoenas. The administrator's physical assets (USD-denominated) were the key attribution vector.</div>
+          <div class="case-tags">
+            <span class="case-tag">Darknet market</span>
+            <span class="case-tag">TOR infrastructure</span>
+            <span class="case-tag">Weapons trafficking</span>
+            <span class="case-tag">VA tracing</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 fade-up d3">
+        <div class="case-card h-100">
+          <div class="case-number">CASE STUDY // 03 · FINLAND / ITALY</div>
+          <div class="card-accent-bar bar-warn" style="border-radius:16px 16px 0 0;top:0;left:0;right:0;position:relative;height:3px;margin-bottom:.75rem;"></div>
+          <div class="case-title">Investment Scam TF Mule Network — Pensioner Targeting</div>
+          <div class="case-jurisdiction">🇫🇮 Finland · 🇮🇹 Italy · Multi-continent</div>
+          <div class="case-text">Foreign nationals targeted elderly pensioners via phone/email/social media offering fake VA investment opportunities. Victims used as unwitting TF mules — instructed to deposit funds via crypto ATMs to attacker-specified wallet addresses. Remote desktop access used to conduct unauthorized transfers.<br><br><strong style="color:var(--accent2);">TF Forensic Lens:</strong> Victim-mule network maps to foreign terrorist fighter funding architecture. Crypto ATM transactions are forensically rich — log IP, device, facial recognition data. Prosecution requires victim support framework. Italian variant: EUR 180K dark trading linked to darknet markets, online betting, and mixing — textbook TF integration.</div>
+          <div class="case-tags">
+            <span class="case-tag">Social engineering</span>
+            <span class="case-tag">Crypto ATM</span>
+            <span class="case-tag">Victim protection</span>
+            <span class="case-tag">Remote access</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═══ TOOLS ═══ -->
+<section class="section" id="tools">
+  <div class="container-xl">
+    <div class="row mb-4">
+      <div class="col-lg-8 fade-up d1">
+        <span class="section-label">// SECTION 06</span>
+        <h2 class="section-title">Forensic <span style="color:var(--accent3)">Tools & Techniques</span></h2>
+        <p style="color:var(--text-muted);font-size:.9rem;line-height:1.7;">Practitioner-recommended tooling ecosystem for TF investigations involving virtual assets, organized by investigation phase.</p>
+      </div>
+    </div>
+
+    <div class="custom-tabs mb-4 fade-up d2" style="max-width:700px;">
+      <button class="custom-tab active" onclick="showTools('analytics')">Blockchain Analytics</button>
+      <button class="custom-tab" onclick="showTools('osint')">OSINT & Dark Web</button>
+      <button class="custom-tab" onclick="showTools('legal')">Legal & Reporting</button>
+      <button class="custom-tab" onclick="showTools('techniques')">Analysis Techniques</button>
+    </div>
+
+    <div id="tools-analytics" class="fade-up d3">
+      <div class="tool-grid">
+        <div class="tool-item"><div class="tool-cat">CHAIN ANALYSIS</div><div class="tool-name">Chainalysis Reactor</div><div class="tool-desc">Industry-standard TX graph visualization + entity attribution. KYTE integration for TF watchlist screening.</div></div>
+        <div class="tool-item"><div class="tool-cat">RISK SCORING</div><div class="tool-name">TRM Labs</div><div class="tool-desc">Real-time VA transaction risk scoring. Strong darknet market and sanctioned entity exposure detection.</div></div>
+        <div class="tool-item"><div class="tool-cat">MULTI-CHAIN</div><div class="tool-name">Crystal Blockchain</div><div class="tool-desc">Multi-chain analytics with AML risk indicators. Covers BTC, ETH, Monero (limited), Tether, and more.</div></div>
+        <div class="tool-item"><div class="tool-cat">OPEN SOURCE</div><div class="tool-name">OXT.me</div><div class="tool-desc">Free Bitcoin transaction explorer with clustering analytics. Useful for initial wallet mapping before paid tool deployment.</div></div>
+        <div class="tool-item"><div class="tool-cat">FORENSICS</div><div class="tool-name">Elliptic Investigator</div><div class="tool-desc">Forensic-grade wallet investigation with mixer detection and darknet exposure scoring. Used by major FIUs globally.</div></div>
+        <div class="tool-item"><div class="tool-cat">MONITORING</div><div class="tool-name">Scorechain</div><div class="tool-desc">European-compliant AML monitoring. STR auto-generation capability for VASP compliance teams.</div></div>
+      </div>
+    </div>
+
+    <div id="tools-osint" class="fade-up d3" style="display:none;">
+      <div class="tool-grid">
+        <div class="tool-item"><div class="tool-cat">DARKNET INTEL</div><div class="tool-name">DarkOwl Vision</div><div class="tool-desc">Darknet and deep web monitoring — search wallet addresses, usernames, and entity names across darknet markets and forums.</div></div>
+        <div class="tool-item"><div class="tool-cat">SOCIAL OSINT</div><div class="tool-name">Maltego</div><div class="tool-desc">Entity relationship mapping. Integrates with blockchain analytics transforms for VA+social media correlation.</div></div>
+        <div class="tool-item"><div class="tool-cat">IP INTEL</div><div class="tool-name">Shodan / Censys</div><div class="tool-desc">Infrastructure reconnaissance — identify servers, infrastructure behind VPN/TOR exits used by TF actors.</div></div>
+        <div class="tool-item"><div class="tool-cat">SANCTIONED LISTS</div><div class="tool-name">OFAC SDN + UN Lists</div><div class="tool-desc">OFAC Specially Designated Nationals list + UN Consolidated Sanctions List. Essential for entity screening in TF investigations.</div></div>
+        <div class="tool-item"><div class="tool-cat">TELEGRAM INTEL</div><div class="tool-name">Telegago / TelegramDB</div><div class="tool-desc">Monitor extremist Telegram channels for VA wallet addresses soliciting TF donations — real-time fundraising intelligence.</div></div>
+        <div class="tool-item"><div class="tool-cat">DOMAIN INTEL</div><div class="tool-name">WHOIS / ViewDNS</div><div class="tool-desc">Identify domain registration obfuscation — TF actors use privacy WHOIS and offshore registrars to hide online presence.</div></div>
+      </div>
+    </div>
+
+    <div id="tools-legal" class="fade-up d3" style="display:none;">
+      <div class="tool-grid">
+        <div class="tool-item"><div class="tool-cat">FIU NETWORK</div><div class="tool-name">Egmont Secure Web</div><div class="tool-desc">Secure inter-FIU communication platform for sharing TF intelligence across Egmont Group member jurisdictions.</div></div>
+        <div class="tool-item"><div class="tool-cat">STR FILING</div><div class="tool-name">goAML (UNODC)</div><div class="tool-desc">UNODC standard for STR/SAR submission. Used by 60+ FIUs. Ensure VA-specific reporting fields are fully populated.</div></div>
+        <div class="tool-item"><div class="tool-cat">MLA PROCESS</div><div class="tool-name">MLA Direct (CoE)</div><div class="tool-desc">Council of Europe Mutual Legal Assistance direct request system — critical for cross-border VA evidence gathering.</div></div>
+        <div class="tool-item"><div class="tool-cat">INTERPOL</div><div class="tool-name">I-24/7 Network</div><div class="tool-desc">Interpol's secure police communications for TF suspect information exchange and red notice coordination.</div></div>
+        <div class="tool-item"><div class="tool-cat">EU COOPERATION</div><div class="tool-name">Europol SIENA</div><div class="tool-desc">Secure Information Exchange Network Application — EU LEA coordination for TF investigations with cross-border elements.</div></div>
+        <div class="tool-item"><div class="tool-cat">ASSET FREEZE</div><div class="tool-name">UN SC Resolutions</div><div class="tool-desc">UN Security Council Resolution 1373 (TF) and 1267 (Al-Qaeda/ISIL) — legal basis for mandatory asset freeze obligations.</div></div>
+      </div>
+    </div>
+
+    <div id="tools-techniques" class="fade-up d3" style="display:none;">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="glass-card p-4 h-100">
+            <div style="font-family:'Space Mono',monospace;font-size:.68rem;color:var(--accent2);letter-spacing:1px;margin-bottom:1rem;">WALLET CLUSTERING TECHNIQUES</div>
+            <div class="rf-card"><div class="rf-title">Common-Input-Ownership Heuristic</div><div class="rf-text">Multiple inputs in a single transaction likely controlled by same entity. Build cluster graphs to identify controlling wallets in TF networks.</div></div>
+            <div class="rf-card"><div class="rf-title">Change Address Detection</div><div class="rf-text">Identify unspent change outputs returning to sender. Trace TF operational wallets through repeated change address patterns.</div></div>
+            <div class="rf-card"><div class="rf-title">Timing & Amount Correlation</div><div class="rf-text">Post-mixer: correlate amounts and timestamps of input/output transactions to pierce mixing obfuscation. Effective against basic tumblers.</div></div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="glass-card p-4 h-100">
+            <div style="font-family:'Space Mono',monospace;font-size:.68rem;color:var(--accent2);letter-spacing:1px;margin-bottom:1rem;">ADVANCED FORENSIC METHODOLOGIES</div>
+            <div class="rf-card"><div class="rf-title">Graph Neural Network Analysis</div><div class="rf-text">ML-based transaction graph classification (Elliptic dataset trained models) — automated TF cluster identification at scale across millions of transactions.</div></div>
+            <div class="rf-card"><div class="rf-title">Cross-chain Transaction Tracing</div><div class="rf-text">Following funds through bridge protocols and atomic swaps between chains. TF actors use cross-chain movement to exploit per-chain analytics tool limitations.</div></div>
+            <div class="rf-card"><div class="rf-title">UTXO Set Analysis</div><div class="rf-text">For Bitcoin: analyze unspent transaction output sets to identify dormant TF fund reserves. Cross-reference with threat intelligence timelines for activation patterns.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="footer-section">
+  <div class="container-xl">
+    <div class="row g-4 align-items-center">
+      <div class="col-md-5">
+        <div class="brand-logo mb-2">
+          <div class="brand-icon"><i class="fas fa-shield-halved"></i></div>
+          CHAINLOGIC :: TF FORENSIC GUIDE
+        </div>
+        <p style="font-size:.8rem;color:var(--text-muted);line-height:1.65;max-width:360px;">
+          An analytical intelligence dashboard for crypto forensic investigators. All content derived from the FATF Virtual Assets Red Flag Indicators Report (September 2020). This dashboard represents original analytical work and commentary — not a reproduction of FATF materials.
+        </p>
+        <p style="font-size:.78rem;color:var(--text-muted);line-height:1.6;max-width:360px;margin-top:.6rem;">
+          <span class="sol-dot me-1"></span>Workshop material produced under a <a href="#workshop" style="color:var(--accent3);text-decoration:none;">Solana Foundation grant</a>.
+        </p>
+        <a href="#" class="ck-link" data-bs-toggle="modal" data-bs-target="#cookieModal"><i class="bi bi-cookie me-1"></i>Cookie policy &amp; settings</a>
+      </div>
+      <div class="col-md-3">
+        <div style="font-family:'Space Mono',monospace;font-size:.68rem;color:var(--accent2);letter-spacing:1px;margin-bottom:.7rem;">REFERENCES</div>
+        <div style="font-size:.8rem;color:var(--text-muted);line-height:1.8;">
+          FATF (2020) VA Red Flag Indicators<br>
+          FATF Rec. 15 / Interpretative Note<br>
+          FATF VASP Risk-Based Approach (2019)<br>
+          UN SC Resolutions 1267, 1373<br>
+          OFAC SDN List · EU Sanctions Map
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div style="font-family:'Space Mono',monospace;font-size:.68rem;color:var(--accent2);letter-spacing:1px;margin-bottom:.7rem;">INVESTIGATOR QUICK REFERENCE</div>
+        <div class="d-flex flex-wrap gap-2">
+          <span style="font-size:.75rem;background:rgba(232,72,85,.12);border:1px solid var(--red-border);color:#f08090;padding:.3em .7em;border-radius:7px;">TF = Terrorist Financing</span>
+          <span style="font-size:.75rem;background:var(--glow);border:1px solid var(--border);color:var(--accent2);padding:.3em .7em;border-radius:7px;">STR = Suspicious TX Report</span>
+          <span style="font-size:.75rem;background:var(--glow);border:1px solid var(--border);color:var(--accent2);padding:.3em .7em;border-radius:7px;">AEC = Anonymity Enhanced Coin</span>
+          <span style="font-size:.75rem;background:var(--glow);border:1px solid var(--border);color:var(--accent2);padding:.3em .7em;border-radius:7px;">FTF = Foreign Terrorist Fighter</span>
+          <span style="font-size:.75rem;background:var(--glow);border:1px solid var(--border);color:var(--accent2);padding:.3em .7em;border-radius:7px;">VASP = VA Service Provider</span>
+          <span style="font-size:.75rem;background:var(--glow);border:1px solid var(--border);color:var(--accent2);padding:.3em .7em;border-radius:7px;">FIU = Financial Intelligence Unit</span>
+        </div>
+        <div style="font-size:.72rem;color:var(--text-muted);margin-top:.8rem;">
+          <span class="pulse-dot" style="width:6px;height:6px;margin-right:.3rem;"></span>
+          Non-endorsement disclaimer: This dashboard is independent analytical commentary. Not affiliated with or endorsed by FATF/OECD.
+        </div>
+      </div>
+    </div>
+    <!-- ═══ OPEN SOURCE ═══ -->
+    <div class="oss-strip">
+      <div class="d-flex flex-column flex-md-row align-items-center justify-content-center gap-3 mb-4">
+        <p>This is an open source project under the A Creative Commons (CC) license, meaning it requires Attribution (BY)—giving credit to the creator—and may combine up to three additional conditions:
+• BY (Attribution): Credit the creator, link to the license, and note any changes made.
+• SA (ShareAlike): Share any adapted or remixed work under the same (or compatible) license.
+• NC (NonCommercial): Allow noncommercial use only (no primary monetary compensation or commercial advantage).
+• ND (NoDerivatives): Share the work only in its original, unadapted form.
+      Built with ❤️ for the Solana community, funded by a Solana Foundation Grant</p>
+        <a href="https://github.com/rugerpunk/terrorist--financing" target="_blank" rel="noopener" class="btn btn-github-glow px-4 py-2">
+          <i class="bi bi-github me-2"></i> Fork it on GitHub
+        </a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══ COOKIE MODULE ═══ -->
+<div class="cookie-bar" id="cookieBar" role="region" aria-label="Cookie consent">
+  <div class="cookie-ic"><i class="bi bi-cookie"></i></div>
+  <div class="cookie-txt"><strong>Cookies on this guide.</strong> One essential cookie stores your choice. With your consent we also use <strong>Google Analytics</strong> to understand how the guide is used, and a preference cookie to remember your settings. Nothing loads from Google until you accept.</div>
+  <div class="cookie-actions">
+    <button type="button" class="ck-btn ck-accept" data-ck="accept"><i class="bi bi-check2"></i>Accept</button>
+    <button type="button" class="ck-btn ck-reject" data-ck="reject"><i class="bi bi-x-lg"></i>Reject</button>
+    <button type="button" class="ck-btn ck-read" data-bs-toggle="modal" data-bs-target="#cookieModal"><i class="bi bi-file-earmark-text"></i>Read Cookies</button>
+  </div>
+</div>
+<button type="button" class="cookie-fab" id="cookieFab" aria-label="Cookie settings" title="Cookie settings" data-bs-toggle="modal" data-bs-target="#cookieModal"><i class="bi bi-cookie"></i></button>
+<div class="ck-toast" id="ckToast" role="status" aria-live="polite"></div>
+
+<div class="modal fade modal-cyber" id="cookieModal" tabindex="-1" aria-labelledby="cookieModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="d-flex align-items-center gap-3">
+          <div class="cookie-ic"><i class="bi bi-shield-lock"></i></div>
+          <div><div class="hop-badge">CRYPTO SENTINEL · LAST UPDATED 19 NOV 2026</div><h5 class="modal-title fw-bold" id="cookieModalLabel">Cookie Policy</h5></div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body px-4">
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+          <span class="small text-muted-c">Your current choice:</span>
+          <span class="risk-badge risk-med" id="ckStatus">NOT SET</span>
+        </div>
+
+        <div class="ck-choices">
+          <div class="ck-choice">
+            <div><div class="fw-semibold small">Strictly necessary</div><div class="ck-choice-d">Stores your cookie choice. Always on.</div></div>
+            <div class="form-check form-switch m-0"><input class="form-check-input" type="checkbox" checked disabled aria-label="Strictly necessary (always on)"></div>
+          </div>
+          <div class="ck-choice">
+            <div><div class="fw-semibold small">Preferences</div><div class="ck-choice-d">Remembers the selected flow phase, red-flag category and tools tab.</div></div>
+            <div class="form-check form-switch m-0"><input class="form-check-input" type="checkbox" id="ckPrefs" aria-label="Preference cookies"></div>
+          </div>
+          <div class="ck-choice">
+            <div><div class="fw-semibold small">Analytics · Google Analytics 4</div><div class="ck-choice-d">Anonymous usage statistics: pages, sections and features used.</div></div>
+            <div class="form-check form-switch m-0"><input class="form-check-input" type="checkbox" id="ckAnalytics" aria-label="Analytics cookies"></div>
+          </div>
+        </div>
+
+        <div class="pol-h"><span>01</span>Who we are</div>
+        <p class="pol-p">This guide is published by Crypto Sentinel (gabidumitriu.ro), Iași, Romania, which acts as the controller for data collected through this page. For questions about this policy or to exercise your rights, use the contact details on gabidumitriu.ro.</p>
+
+        <div class="pol-h"><span>02</span>What cookies are</div>
+        <p class="pol-p">Cookies are small text files a website stores in your browser. Similar technologies, such as local storage, are covered by this policy too. Where your browser blocks first-party cookies (for example, when the page is opened as a local file), this guide stores your choice in local storage with the same name, purpose and lifetime.</p>
+
+        <div class="pol-h"><span>03</span>Cookies we use</div>
+        <div class="ck-table-wrap">
+          <table class="ck-table">
+            <thead><tr><th>Name</th><th>Category</th><th>Provider · purpose</th><th>Lifetime</th></tr></thead>
+            <tbody>
+              <tr><td>cs_consent</td><td>Strictly necessary</td><td>Crypto Sentinel · records your choices and when you made them, so the banner is not shown again.</td><td>180 days</td></tr>
+              <tr><td>cs_prefs</td><td>Preferences</td><td>Crypto Sentinel · remembers the selected TF flow phase, red-flag category and tools tab.</td><td>180 days</td></tr>
+              <tr><td>_ga</td><td>Analytics</td><td>Google · distinguishes visitors with a random, pseudonymous ID.</td><td>2 years</td></tr>
+              <tr><td>_ga_&lt;ID&gt;</td><td>Analytics</td><td>Google · keeps session state for this site's Analytics property.</td><td>2 years</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="pol-p mt-2">We do <strong class="text-light">not</strong> use advertising, remarketing or social-media cookies. Google Signals and ad personalisation are switched off, and Google's advertising consent signals stay "denied".</p>
+
+        <div class="pol-h"><span>04</span>Google Analytics</div>
+        <p class="pol-p">Google Analytics 4 is provided by Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Ireland. When you consent, it collects pseudonymous identifiers, pages and sections viewed, dashboard interactions (for example, which flow phase or red-flag category you open), device and browser type, and approximate location derived from your IP address. According to Google, GA4 does not log or store IP addresses for EU users. Data may be transferred to Google LLC in the United States, which is certified under the EU–U.S. Data Privacy Framework. Event data is kept for 14 months.</p>
+        <p class="pol-p">The Analytics script is loaded <strong class="text-light">only after</strong> you consent. Before that, no request is made to Google Analytics. If you withdraw consent, tracking stops and the <span class="mono">_ga</span> cookies are deleted from your browser.</p>
+
+        <div class="pol-h"><span>05</span>Legal basis</div>
+        <p class="pol-p">The strictly necessary cookie is exempt from consent under Art. 5(3) of the ePrivacy Directive 2002/58/EC, as transposed in Romania by Art. 4(5) of Law no. 506/2004. Preference and analytics cookies are used only with your consent, under Art. 6(1)(a) GDPR (Regulation (EU) 2016/679). Refusing them does not limit access to any content.</p>
+
+        <div class="pol-h"><span>06</span>Other third-party resources</div>
+        <p class="pol-p">The page loads Bootstrap and Font Awesome from cdnjs (Cloudflare), Bootstrap Icons from jsDelivr and fonts from Google Fonts. These providers receive your IP address and browser details when the files are requested, as with any web request. They do not set cookies through this page; their own privacy policies apply. The "Fork it on GitHub" link only contacts GitHub if you click it.</p>
+
+        <div class="pol-h"><span>07</span>Your rights</div>
+        <p class="pol-p">You can withdraw or change consent at any time, as easily as you gave it, using the switches above or the cookie button in the bottom-left corner. You also have the rights of access, rectification, erasure, restriction, objection and portability under the GDPR, and the right to complain to the Romanian supervisory authority, ANSPDCP (dataprotection.ro). To opt out of Google Analytics across all sites, you can also use Google's browser add-on (tools.google.com/dlpage/gaoptout).</p>
+
+        <div class="pol-h"><span>08</span>Stored on this device now</div>
+        <div class="ck-live" id="ckLive">—</div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="ck-btn" data-bs-dismiss="modal"><i class="bi bi-arrow-left"></i>Close</button>
+        <div class="d-flex flex-wrap gap-2">
+          <button type="button" class="ck-btn ck-reject" data-ck="reject" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i>Reject all</button>
+          <button type="button" class="ck-btn ck-read" data-ck="save" data-bs-dismiss="modal"><i class="bi bi-sliders"></i>Save choices</button>
+          <button type="button" class="ck-btn ck-accept" data-ck="accept" data-bs-dismiss="modal"><i class="bi bi-check2"></i>Accept all</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ── Cookie consent + Google Analytics module (ported from the OFAC guide) ── */
+window.CSConsent = (() => {
+  'use strict';
+  const VERSION = 2, DAYS = 180, KEY = 'cs_consent', PREF = 'cs_prefs', mem = {};
+  const GA_ID = String(window.CS_GA_ID || '').trim();
+  const GA_READY = /^G-[A-Z0-9]{4,}$/.test(GA_ID) && GA_ID !== 'G-XXXXXXXXXX';
+  const https = location.protocol === 'https:';
+  const cookiesWork = (() => {
+    try { document.cookie = 'cs_test=1;path=/;SameSite=Lax';
+      const ok = document.cookie.indexOf('cs_test=1') !== -1;
+      document.cookie = 'cs_test=;max-age=0;path=/'; return ok; } catch (e) { return false; }
+  })();
+  const lsWorks = (() => { try { localStorage.setItem('cs_t','1'); localStorage.removeItem('cs_t'); return true; } catch (e) { return false; } })();
+  const mechanism = cookiesWork ? 'HTTP cookie' : lsWorks ? 'localStorage (cookies blocked by browser)' : 'memory only (storage blocked)';
+
+  /* storage */
+  function write(k, v){
+    if (cookiesWork){ document.cookie = `${k}=${encodeURIComponent(v)};max-age=${DAYS*86400};path=/;SameSite=Lax${https ? ';Secure' : ''}`; return; }
+    if (lsWorks){ try { localStorage.setItem(k, JSON.stringify({v, exp: Date.now() + DAYS*864e5})); return; } catch (e) {} }
+    mem[k] = v;
+  }
+  function read(k){
+    if (cookiesWork){
+      const row = document.cookie.split('; ').find(c => c.startsWith(k + '='));
+      return row ? decodeURIComponent(row.slice(k.length + 1)) : null;
+    }
+    if (lsWorks){ try { const o = JSON.parse(localStorage.getItem(k)); if (!o) return null;
+      if (o.exp < Date.now()){ localStorage.removeItem(k); return null; } return o.v; } catch (e) { return null; } }
+    return mem[k] ?? null;
+  }
+  function erase(k){
+    if (cookiesWork) document.cookie = `${k}=;max-age=0;path=/`;
+    try { localStorage.removeItem(k); } catch (e) {}
+    delete mem[k];
+  }
+  const parse = s => { try { return JSON.parse(s); } catch (e) { return null; } };
+
+  /* consent state: {v, prefs, analytics, ts} */
+  const consent = () => { const c = parse(read(KEY)); return c && c.v === VERSION ? c : null; };
+  const allows = cat => { const c = consent(); return !!(c && c[cat]); };
+  const status = () => { const c = consent(); if (!c) return null;
+    return c.prefs && c.analytics ? 'accepted' : !c.prefs && !c.analytics ? 'rejected' : 'custom'; };
+
+  /* Google Analytics 4 — gtag.js is only requested after consent */
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = window.gtag || function(){ dataLayer.push(arguments); };
+  let gaLoaded = false;
+  function gaCookies(){ return document.cookie.split('; ').map(c => c.split('=')[0]).filter(n => n === '_ga' || n.startsWith('_ga_') || n === '_gid' || n === '_gat'); }
+  function clearGA(){
+    const parts = location.hostname.split('.'), domains = [''];
+    for (let i = 0; i < parts.length - 1; i++) domains.push(';domain=.' + parts.slice(i).join('.'));
+    gaCookies().forEach(n => domains.forEach(d => { document.cookie = `${n}=;max-age=0;path=/${d}`; }));
+  }
+  function enableGA(){
+    if (!GA_READY) return;
+    window['ga-disable-' + GA_ID] = false;
+    gtag('consent', 'update', {analytics_storage: 'granted'});
+    if (gaLoaded) return;
+    const s = document.createElement('script');
+    s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(GA_ID);
+    document.head.appendChild(s);
+    gtag('js', new Date());
+    gtag('config', GA_ID, {
+      allow_google_signals: false,
+      allow_ad_personalization_signals: false,
+      cookie_flags: 'SameSite=Lax' + (https ? ';Secure' : '')
+    });
+    gaLoaded = true;
+  }
+  function disableGA(){
+    if (GA_READY) window['ga-disable-' + GA_ID] = true;
+    gtag('consent', 'update', {analytics_storage: 'denied'});
+    clearGA();
+  }
+  function track(name, params){
+    if (!GA_READY || !gaLoaded || !allows('analytics')) return;
+    gtag('event', name, params || {});
+  }
+
+  /* decisions */
+  const listeners = [];
+  function apply(){ allows('analytics') ? enableGA() : disableGA(); if (!allows('prefs')) erase(PREF); }
+  function decide(prefs, analytics){
+    write(KEY, JSON.stringify({v: VERSION, prefs, analytics, ts: new Date().toISOString()}));
+    apply(); render();
+    const st = status();
+    toast(st === 'accepted' ? '<i class="bi bi-check-circle-fill" style="color:var(--accent3)"></i>Analytics and preferences enabled'
+        : st === 'rejected' ? '<i class="bi bi-slash-circle" style="color:#ff8a94"></i>Only the essential cookie is kept'
+        : '<i class="bi bi-sliders" style="color:var(--accent3)"></i>Your choices were saved');
+    listeners.forEach(fn => { try { fn(consent()); } catch (e) {} });
+  }
+  function getPref(name, def){ if (!allows('prefs')) return def; const p = parse(read(PREF)) || {}; return name in p ? p[name] : def; }
+  function setPref(name, val){ if (!allows('prefs')) return; const p = parse(read(PREF)) || {}; p[name] = val; write(PREF, JSON.stringify(p)); }
+
+  /* UI */
+  const $id = id => document.getElementById(id);
+  const bar = $id('cookieBar'), fab = $id('cookieFab'), toastEl = $id('ckToast');
+  let tt;
+  function toast(html){ toastEl.innerHTML = html; toastEl.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => toastEl.classList.remove('show'), 2600); }
+  function render(){
+    const st = status();
+    bar.classList.toggle('show', !st);
+    fab.classList.toggle('show', !!st);
+    document.body.classList.toggle('ck-pending', !st);
+    const badge = $id('ckStatus');
+    badge.className = 'risk-badge ' + (st === 'accepted' ? 'risk-low' : st === 'rejected' ? 'risk-high' : 'risk-med');
+    badge.textContent = st ? st.toUpperCase() : 'NOT SET';
+  }
+  function renderModal(){
+    $id('ckPrefs').checked = allows('prefs');
+    $id('ckAnalytics').checked = allows('analytics');
+    const c = consent(), p = read(PREF), ga = gaCookies();
+    const esc = s => String(s).replace(/[<>&"]/g, ch => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[ch]));
+    $id('ckLive').innerHTML =
+      `storage: <b>${mechanism}</b><br>` +
+      `cs_consent = <b>${c ? esc(JSON.stringify(c)) : '(not set)'}</b><br>` +
+      `cs_prefs &nbsp;&nbsp;= <b>${p ? esc(p) : '(not set)'}</b><br>` +
+      `analytics &nbsp;= <b>${!GA_READY ? 'not configured on this page' : gaLoaded && allows('analytics') ? 'active · ' + esc(GA_ID) : 'off'}</b><br>` +
+      `_ga cookies = <b>${ga.length ? esc(ga.join(', ')) : '(none)'}</b>`;
+  }
+  document.querySelectorAll('[data-ck]').forEach(b => b.addEventListener('click', () => {
+    const a = b.dataset.ck;
+    if (a === 'accept') decide(true, true);
+    else if (a === 'reject') decide(false, false);
+    else decide($id('ckPrefs').checked, $id('ckAnalytics').checked);
+  }));
+  $id('cookieModal').addEventListener('show.bs.modal', renderModal);
+
+  render(); apply();
+  if (!status()){ bar.classList.remove('show'); setTimeout(() => bar.classList.add('show'), 900); }
+
+  return {
+    status, track, getPref, setPref,
+    prefsAllowed: () => allows('prefs'),
+    analyticsAllowed: () => allows('analytics'),
+    onChange: fn => listeners.push(fn),
+    accept: () => decide(true, true), reject: () => decide(false, false)
+  };
+})();
+</script>
+<script>
+// ── COUNTER ANIMATION ──
+function animateCounters(){
+  document.querySelectorAll('[data-target]').forEach(el=>{
+    const target=+el.dataset.target;
+    let current=0;
+    const increment=target/50;
+    const timer=setInterval(()=>{
+      current+=increment;
+      if(current>=target){current=target;clearInterval(timer);}
+      el.textContent=(target>20?'+':'')+Math.floor(current);
+    },30);
+  });
+}
+
+// ── PROGRESS BARS ──
+function animateProgressBars(){
+  document.querySelectorAll('[data-width]').forEach(bar=>{
+    setTimeout(()=>{
+      bar.style.width=bar.dataset.width+'%';
+    },300);
+  });
+  document.querySelectorAll('[data-pval]').forEach(el=>{
+    const target=+el.dataset.pval;
+    let current=0;
+    const increment=target/40;
+    const timer=setInterval(()=>{
+      current+=increment;
+      if(current>=target){current=target;clearInterval(timer);}
+      el.textContent=Math.floor(current)+'%';
+    },35);
+  });
+}
+
+// ── INTERSECTION OBSERVER ──
+const observer=new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      entry.target.style.animationPlayState='running';
+      if(entry.target.querySelector('[data-target]'))animateCounters();
+      if(entry.target.querySelector('[data-width]'))animateProgressBars();
+    }
+  });
+},{threshold:.15});
+document.querySelectorAll('.fade-up').forEach(el=>{
+  el.style.animationPlayState='paused';
+  observer.observe(el);
+});
+// init counters and bars immediately for hero
+setTimeout(()=>{animateCounters();animateProgressBars();},400);
+
+// ── TAB HELPERS (consent-aware prefs + analytics) ──
+const CS=window.CSConsent;
+function activateTab(fnName,key){
+  // only the tab group that owns this button is touched
+  const btn=document.querySelector(`.custom-tab[onclick="${fnName}('${key}')"]`);
+  if(!btn)return;
+  btn.closest('.custom-tabs').querySelectorAll('.custom-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function tabChanged(pref,key,evName){
+  CS.setPref(pref,key);
+  if(window.event&&window.event.isTrusted)CS.track(evName,{tab:key});
+}
+
+// ── FLOW TABS ──
+function showFlow(phase){
+  ['phase1','phase2','phase3'].forEach(p=>{
+    const el=document.getElementById('flow-'+p);
+    if(el)el.style.display=p===phase?'block':'none';
+  });
+  activateTab('showFlow',phase);
+  tabChanged('flowPhase',phase,'select_flow_phase');
+}
+
+// ── RED FLAG TABS ──
+function showRF(cat){
+  ['transactions','patterns','anonymity','identity','source','geo'].forEach(c=>{
+    const el=document.getElementById('rf-'+c);
+    if(el)el.style.display=c===cat?'block':'none';
+    if(el)el.classList.toggle('active',c===cat);
+  });
+  activateTab('showRF',cat);
+  tabChanged('redFlagTab',cat,'select_red_flag_category');
+}
+
+// ── TOOL TABS ──
+function showTools(tab){
+  ['analytics','osint','legal','techniques'].forEach(t=>{
+    const el=document.getElementById('tools-'+t);
+    if(el)el.style.display=t===tab?'block':'none';
+  });
+  activateTab('showTools',tab);
+  tabChanged('toolsTab',tab,'select_tools_tab');
+}
+
+// ── RESTORE SAVED TABS (only if preference cookies were accepted) ──
+const currentTab=fn=>{const b=document.querySelector(`.custom-tab.active[onclick^="${fn}("]`);return b?b.getAttribute('onclick').match(/'([^']+)'/)[1]:null;};
+(function restoreTabs(){
+  const fp=CS.getPref('flowPhase'), rf=CS.getPref('redFlagTab'), tl=CS.getPref('toolsTab');
+  if(['phase1','phase2','phase3'].includes(fp))showFlow(fp);
+  if(['transactions','patterns','anonymity','identity','source','geo'].includes(rf))showRF(rf);
+  if(['analytics','osint','legal','techniques'].includes(tl))showTools(tl);
+})();
+// save current state the moment consent is given
+CS.onChange(()=>{
+  if(!CS.prefsAllowed())return;
+  const f=currentTab('showFlow'),r=currentTab('showRF'),t=currentTab('showTools');
+  if(f)CS.setPref('flowPhase',f); if(r)CS.setPref('redFlagTab',r); if(t)CS.setPref('toolsTab',t);
+});
+
+// ── GA: one section_view per section per page load ──
+const seenSections=new Set();
+const secIO=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting&&!seenSections.has(e.target.id)){seenSections.add(e.target.id);CS.track('section_view',{section:e.target.id});}
+}),{threshold:.35});
+document.querySelectorAll('section[id]').forEach(s=>secIO.observe(s));
+document.querySelectorAll('a[href*="github.com"]').forEach(a=>a.addEventListener('click',()=>CS.track('github_fork_click')));
+
+// ── NODE INFO ──
+const nodeInfoMap={
+  sympathizers:"🔍 FORENSIC TIP: Monitor Telegram/Signal channels for VA wallet addresses soliciting TF donations. Cross-reference with known extremist network OSINT. Small micro-transactions from multiple global senders = crowdfunding TF red flag.",
+  crowdfund:"🔍 FORENSIC TIP: Encrypted platform fundraising bypasses traditional payment monitoring. Correlate wallet addresses with darknet forum posts and extremist messaging platforms. Flag accounts with no prior transaction history suddenly receiving from 50+ wallets.",
+  collection:"⚠ CRITICAL NODE: Collection wallet is the highest-value attribution target. If identified, request VASP CDD data immediately. This wallet maps to the TF network coordinator — all downstream transactions lead to operational deployment.",
+  'weak-vasp':"🌐 FORENSIC TIP: Identify the receiving VASP jurisdiction. If outside FATF-compliant territory, initiate FIU-to-FIU contact via Egmont Secure Web. Document full jurisdictional chain — required for MLA proceedings.",
+  'dirty-wallet':"🔍 SOURCE WALLET: Apply full blockchain analytics tracing. Identify all prior inflows — map TF fundraising network. Check against Chainalysis/Elliptic darknet exposure scores and OFAC SDN wallet list.",
+  mixer:"⚠ MIXER DETECTED: Document entry and exit transactions. Apply timing analysis — amounts in vs amounts out within 1-hour windows. Check Helix, Wasabi, JoinMarket signatures. Mixer usage alone justifies STR filing.",
+  'privacy-coin':"☣ AEC USAGE: Monero (XMR) and Zcash (ZEC) significantly complicate tracing. Note: conversion FROM transparent chain TO privacy coin is the forensic moment — capture the swap transaction details on the transparent chain before the trail goes dark.",
+  'multi-vasp':"🔍 MULTI-VASP PATTERN: 48+ accounts across multiple exchanges (Korea case). Request VASP data simultaneously — coordinate to prevent tip-off. Look for shared device fingerprints, IP addresses, or email domain patterns across accounts.",
+  atm:"🏧 ATM FORENSICS: Crypto ATMs generate rich forensic data — CCTV, phone number, IP address, sometimes facial biometrics. Request ATM operator data immediately. Machine location in high-crime area + repeated use = mandatory STR.",
+  'darknet-purchase':"🔫 DARKNET WEAPONS: VA addresses with darknet market exposure are the clearest TF operational indicator. Apply Reactor/TRM to score full darknet exposure. Report to national security agencies immediately — may indicate imminent threat.",
+  ftf:"✈ FTF FINANCING: Correlate VA cash-out points with border crossing data, travel bookings, and conflict-zone entry records. FTF financing is a national security priority — escalate beyond FIU to intelligence services immediately.",
+  'clean-wallet':"🧹 POST-LAYERING WALLET: Even 'clean' wallets retain forensic traces. Apply pre-image analysis — what mixer/chain input generated this wallet? Temporal clustering of withdrawal patterns can identify TF operational funding cycles."
+};
+function showNodeInfo(nodeId){
+  const info=nodeInfoMap[nodeId]||"Click on flow nodes for forensic investigation tips.";
+  // Find the closest node-info div and show it
+  const infoBoxes=document.querySelectorAll('#node-info');
+  infoBoxes.forEach(box=>{
+    box.style.display='block';
+    box.innerHTML='<i class="fas fa-crosshairs" style="color:var(--accent2);margin-right:.5rem;"></i>'+info;
+  });
+}
+
+// ── NAV ACTIVE STATES ──
+const sections=document.querySelectorAll('section[id]');
+const navLinks=document.querySelectorAll('.nav-pill');
+window.addEventListener('scroll',()=>{
+  let current='';
+  sections.forEach(s=>{
+    if(window.scrollY>=s.offsetTop-200)current=s.id;
+  });
+  navLinks.forEach(l=>{
+    l.classList.remove('active');
+    if(l.getAttribute('href')==='#'+current)l.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
